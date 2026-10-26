@@ -1,0 +1,11 @@
+system,alarms,per_turbine_year
+twin eff,0,0.000
+twin anemo,0,0.000
+twin yaw,0,0.000
+twin derate,0,0.000
+twin gear,0,0.000
+twin gen,5,0.416
+WARP,13,1.083
+NBM,12,0.999
+WARP + NBM,25,2.082
+twin (all types),5,0.416

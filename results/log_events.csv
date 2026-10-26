@@ -1,0 +1,112 @@
+turbine,fault,start,end,messages,twin_p_max_before,twin_p_max_around,twin_before,twin_around,twin_chance_before,WARP_before,WARP_around,WARP_chance_before,NBM_before,NBM_around,NBM_chance_before
+1,anemo,2020-12-07 10:07:29+00:00,2020-12-07 10:07:29+00:00,Icing (anemometer),0.025,0.066,False,False,0.000,False,False,0.109,False,False,0.000
+1,anemo,2020-12-28 09:31:00+00:00,2021-01-24 16:57:41+00:00,Icing (anemometer),0.060,0.287,False,False,0.000,False,True,0.109,False,False,0.000
+1,anemo,2021-12-06 02:45:49+00:00,2021-12-22 02:42:23+00:00,4-20mA anemometer 2; Anemometer defect,0.126,0.126,False,False,0.000,False,False,0.109,False,False,0.000
+2,anemo,2020-12-28 09:31:43+00:00,2021-01-09 18:01:06+00:00,Icing (anemometer),0.052,0.317,False,False,0.000,False,False,0.109,False,False,0.000
+3,anemo,2020-06-13 07:42:48+00:00,2020-06-13 07:42:48+00:00,4-20mA anemometer 1; 4-20mA anemometer 2,0.047,0.070,False,False,0.055,False,False,0.164,False,False,0.000
+3,anemo,2020-12-07 09:05:19+00:00,2020-12-07 09:05:19+00:00,Icing (anemometer),0.030,0.066,False,False,0.055,False,False,0.164,False,False,0.000
+3,anemo,2021-01-09 18:05:12+00:00,2021-01-09 18:05:12+00:00,Icing (anemometer),0.066,0.232,False,False,0.055,False,False,0.164,False,False,0.000
+4,anemo,2020-12-07 11:16:39+00:00,2020-12-07 11:16:39+00:00,Icing (anemometer),0.043,0.031,False,False,0.055,False,False,0.055,False,False,0.000
+4,anemo,2020-12-28 09:23:24+00:00,2021-01-08 22:18:52+00:00,Icing (anemometer),0.043,0.345,False,False,0.055,False,False,0.055,False,False,0.000
+4,anemo,2021-01-24 16:53:04+00:00,2021-01-24 16:53:04+00:00,Icing (anemometer),0.345,1.000,False,True,0.055,False,False,0.055,False,False,0.000
+4,anemo,2021-12-19 02:09:59+00:00,2021-12-19 02:10:03+00:00,4-20mA anemometer 2; Anemometer defect,0.313,0.006,False,False,0.055,False,False,0.055,False,False,0.000
+5,anemo,2020-12-07 09:43:47+00:00,2020-12-07 09:43:47+00:00,Icing (anemometer),0.174,0.683,False,False,0.055,False,False,0.219,False,False,0.000
+5,anemo,2020-12-31 06:02:04+00:00,2021-01-09 18:02:25+00:00,Icing (anemometer),0.683,0.219,False,False,0.055,False,True,0.219,False,False,0.000
+5,anemo,2021-11-03 11:43:24+00:00,2021-11-03 11:49:41+00:00,4-20mA anemometer 1; 4-20mA anemometer 2,0.181,0.521,False,False,0.055,True,False,0.219,False,False,0.000
+5,anemo,2021-12-17 19:29:09+00:00,2021-12-17 19:48:18+00:00,4-20mA anemometer 2; Anemometer defect,0.521,0.079,False,False,0.055,False,False,0.219,False,False,0.000
+1,yaw,2020-05-25 15:29:33+00:00,2020-05-25 15:29:33+00:00,Yaw error,0.030,0.033,False,False,0.000,True,False,0.383,False,False,0.000
+1,yaw,2020-08-22 09:01:05+00:00,2020-08-22 09:01:05+00:00,Uncontrolled yaw movement,0.110,0.014,False,False,0.000,False,False,0.383,False,False,0.000
+1,yaw,2021-12-06 02:45:49+00:00,2021-12-22 02:42:23+00:00,4-20 mA vane 2,0.349,0.395,False,False,0.000,True,True,0.383,False,False,0.000
+3,yaw,2019-12-08 05:50:40+00:00,2019-12-08 05:50:40+00:00,Uncontrolled yaw movement,0.005,0.002,False,False,0.000,False,False,0.055,False,False,0.000
+3,yaw,2020-06-13 07:42:48+00:00,2020-06-13 07:42:48+00:00,4-20 mA vane 2,0.006,0.007,False,False,0.000,False,False,0.055,False,False,0.000
+3,yaw,2021-06-23 02:06:45+00:00,2021-06-23 02:06:48+00:00,Vane 2 defect; Vane defect,0.056,0.002,False,False,0.000,False,False,0.055,False,False,0.000
+4,yaw,2019-11-09 07:29:05+00:00,2019-11-09 07:29:07+00:00,Vane 2 defect; Vane defect,0.033,0.021,False,False,0.000,False,False,0.164,False,False,0.000
+4,yaw,2021-12-19 02:10:00+00:00,2021-12-19 02:10:00+00:00,4-20 mA vane 2,0.017,0.013,False,False,0.000,False,False,0.164,False,False,0.000
+5,yaw,2021-07-21 10:59:42+00:00,2021-07-21 10:59:42+00:00,Check vane!,0.972,0.931,True,True,0.164,True,True,1.000,False,False,0.000
+5,yaw,2021-11-03 11:43:24+00:00,2021-11-15 23:18:56+00:00,4-20 mA vane 1; 4-20 mA vane 2; Vane 2 defect,0.762,0.938,False,True,0.164,True,True,1.000,False,False,0.000
+5,yaw,2021-12-17 19:29:09+00:00,2021-12-17 19:48:15+00:00,4-20 mA vane 2,0.938,0.958,True,False,0.164,True,True,1.000,False,False,0.000
+6,yaw,2020-03-18 10:20:00+00:00,2020-03-18 10:20:00+00:00,Uncontrolled yaw movement,0.010,0.019,False,False,0.000,False,False,0.109,False,False,0.000
+6,yaw,2021-07-29 09:14:16+00:00,2021-07-29 09:14:16+00:00,Uncontrolled yaw movement,0.070,0.134,False,False,0.000,False,True,0.109,False,False,0.000
+1,gen,2019-05-30 11:40:01+00:00,2019-05-30 12:35:08+00:00,Overload generator fan 1; Overload generator fan 2; Overload generator fan 3; Overload generator heating,0.970,0.788,False,False,0.274,False,False,0.000,True,False,0.328
+1,gen,2019-11-11 14:31:32+00:00,2019-11-13 11:45:26+00:00,Overload generator fan 1; Overload generator fan 2; Overload generator fan 3; Overload generator heating,0.001,0.994,False,True,0.274,False,False,0.000,False,True,0.328
+1,gen,2020-05-25 14:46:45+00:00,2020-05-26 07:21:27+00:00,Overload generator fan 1; Overload generator fan 2; Overload generator fan 3; Overload generator heating,0.145,0.291,False,False,0.274,False,False,0.000,False,False,0.328
+1,gen,2020-12-03 12:19:48+00:00,2020-12-04 10:01:20+00:00,Manual operation generator fan 1; Overload generator heating,0.001,0.984,False,True,0.274,False,False,0.000,False,True,0.328
+1,gen,2021-03-06 10:50:52+00:00,2021-03-06 10:50:52+00:00,Overload generator heating,1.000,0.017,False,False,0.274,False,False,0.000,False,False,0.328
+1,gen,2021-07-29 13:51:37+00:00,2021-07-29 13:51:37+00:00,Overload generator fan 1,0.065,0.989,False,True,0.274,False,False,0.000,False,True,0.328
+1,gen,2021-09-06 11:46:26+00:00,2021-09-06 11:46:26+00:00,Overload generator heating,0.989,0.597,True,False,0.274,False,False,0.000,True,False,0.328
+2,gen,2019-03-25 05:46:11+00:00,2019-03-25 10:32:30+00:00,Overload generator fan 1; Overload generator fan 2; Overload generator fan 3; Overload generator heating; Service generator brushes,0.000,0.000,False,False,0.000,False,False,0.000,False,False,0.109
+2,gen,2019-06-04 06:11:51+00:00,2019-06-04 07:44:38+00:00,Overload generator fan 1; Overload generator fan 2; Overload generator fan 3; Overload generator heating,0.001,0.501,False,False,0.000,False,False,0.000,False,False,0.109
+2,gen,2019-11-20 12:29:03+00:00,2019-11-20 12:29:59+00:00,Overload generator fan 1; Overload generator fan 2; Overload generator fan 3; Overload generator heating,0.002,0.521,False,False,0.000,False,False,0.000,False,False,0.109
+2,gen,2020-05-27 08:24:34+00:00,2020-05-27 10:15:17+00:00,Overload generator fan 1; Overload generator fan 2; Overload generator fan 3; Overload generator heating,0.000,0.001,False,False,0.000,False,False,0.000,False,False,0.109
+2,gen,2020-12-07 12:25:41+00:00,2020-12-07 12:25:41+00:00,Overload generator heating,0.001,0.001,False,False,0.000,False,False,0.000,False,False,0.109
+2,gen,2021-03-08 08:43:21+00:00,2021-03-09 09:08:08+00:00,Manual operation generator fan 1; Overload generator heating,0.002,0.002,False,False,0.000,False,False,0.000,True,False,0.109
+2,gen,2021-09-08 09:18:22+00:00,2021-09-08 09:18:22+00:00,Overload generator heating,0.002,0.150,False,False,0.000,False,False,0.000,False,False,0.109
+3,gen,2019-03-25 11:44:48+00:00,2019-03-25 14:44:00+00:00,Overload generator fan 1; Overload generator fan 2; Overload generator fan 3; Overload generator heating; Service generator brushes,0.001,0.022,False,False,0.000,False,False,0.000,False,False,0.000
+3,gen,2019-06-04 10:10:00+00:00,2019-06-05 07:13:54+00:00,Manual operation generator fan 1; Overload generator fan 1; Overload generator fan 2; Overload generator fan 3; Overload generator heating,0.022,0.253,False,False,0.000,False,False,0.000,False,False,0.000
+3,gen,2019-11-21 16:37:15+00:00,2019-11-21 16:37:19+00:00,Overload generator fan 1; Overload generator fan 2; Overload generator fan 3; Overload generator heating,0.001,0.001,False,False,0.000,False,False,0.000,False,False,0.000
+3,gen,2019-12-11 11:15:31+00:00,2019-12-11 11:15:33+00:00,Overload generator fan 1; Overload generator fan 2; Overload generator fan 3,0.001,0.001,False,False,0.000,False,False,0.000,False,False,0.000
+3,gen,2020-06-12 14:11:33+00:00,2020-06-13 08:12:24+00:00,Overload generator fan 1; Overload generator heating,0.001,0.001,False,False,0.000,False,False,0.000,False,False,0.000
+3,gen,2020-12-09 10:47:35+00:00,2020-12-09 10:47:35+00:00,Overload generator heating,0.007,0.002,False,False,0.000,False,False,0.000,False,False,0.000
+3,gen,2021-04-10 08:06:47+00:00,2021-04-10 15:14:30+00:00,Overload generator fan 1; Overload generator fan 2; Overload generator fan 3,0.001,0.002,False,False,0.000,False,False,0.000,False,False,0.000
+3,gen,2021-05-22 06:48:35+00:00,2021-05-22 09:05:03+00:00,Overload generator fan 1; Overload generator heating,0.002,0.004,False,False,0.000,False,False,0.000,False,False,0.000
+3,gen,2021-09-09 09:43:27+00:00,2021-09-09 09:43:27+00:00,Overload generator heating,0.008,0.001,False,False,0.000,False,False,0.000,False,False,0.000
+4,gen,2019-06-05 12:51:01+00:00,2019-06-06 06:09:01+00:00,Overload generator fan 1; Overload generator fan 2; Overload generator fan 3; Overload generator heating,0.001,0.120,False,False,0.055,False,False,0.000,False,False,0.383
+4,gen,2019-12-12 12:18:22+00:00,2019-12-18 12:14:47+00:00,Manual operation generator fan 1; Overload generator fan 1; Overload generator fan 2; Overload generator fan 3; Overload generator heating,0.003,0.731,False,False,0.055,False,False,0.000,True,True,0.383
+4,gen,2020-06-13 13:03:52+00:00,2020-06-14 07:36:14+00:00,Overload generator fan 1; Overload generator heating,0.001,0.235,False,False,0.055,False,False,0.000,False,False,0.383
+4,gen,2020-12-10 10:31:47+00:00,2020-12-10 10:31:47+00:00,Overload generator heating,0.002,0.863,False,False,0.055,False,False,0.000,False,True,0.383
+4,gen,2021-05-15 06:55:24+00:00,2021-05-16 08:00:09+00:00,Overload generator fan 1; Overload generator fan 2; Overload generator fan 3; Overload generator heating,0.003,0.625,False,False,0.055,False,False,0.000,False,False,0.383
+4,gen,2021-09-10 09:28:31+00:00,2021-09-10 09:28:31+00:00,Overload generator heating,0.005,0.506,False,False,0.055,False,False,0.000,False,False,0.383
+4,gen,2021-11-11 12:13:56+00:00,2021-11-11 12:13:56+00:00,Overload generator fan 1,0.506,0.740,False,False,0.055,False,False,0.000,True,True,0.383
+5,gen,2019-06-06 10:25:49+00:00,2019-06-06 13:06:11+00:00,Overload generator fan 1; Overload generator fan 2; Overload generator fan 3; Overload generator heating,0.106,0.320,False,False,0.055,False,False,0.000,False,False,0.383
+5,gen,2019-12-19 12:49:55+00:00,2019-12-19 12:50:18+00:00,Overload generator fan 1; Overload generator fan 2; Overload generator fan 3; Overload generator heating,0.287,0.445,False,False,0.055,False,False,0.000,False,False,0.383
+5,gen,2020-07-14 08:00:11+00:00,2020-07-14 08:00:11+00:00,Overload generator heating,0.007,0.000,False,False,0.055,False,False,0.000,False,False,0.383
+5,gen,2021-01-05 12:11:09+00:00,2021-01-19 11:52:30+00:00,Manual operation generator fan 1; Overload generator fan 1; Overload generator fan 2; Overload generator heating,0.008,0.997,False,True,0.055,False,False,0.000,False,True,0.383
+5,gen,2021-05-25 07:09:06+00:00,2021-05-25 07:09:06+00:00,Overload generator heating,0.996,0.985,False,False,0.055,False,False,0.000,False,True,0.383
+5,gen,2021-09-16 09:50:06+00:00,2021-09-16 09:50:06+00:00,Overload generator heating,0.014,0.032,False,False,0.055,False,False,0.000,True,True,0.383
+5,gen,2021-11-15 11:38:47+00:00,2021-11-15 11:38:47+00:00,Overload generator heating,0.041,0.680,False,False,0.055,False,False,0.000,False,False,0.383
+6,gen,2019-08-20 08:29:32+00:00,2019-08-20 12:12:18+00:00,Overload generator fan 1; Overload generator fan 2; Overload generator fan 3; Overload generator heating,0.076,0.005,False,False,0.164,False,False,0.000,True,False,0.219
+6,gen,2020-01-29 13:35:25+00:00,2020-01-30 11:48:31+00:00,Manual operation generator fan 1; Overload generator fan 1; Overload generator fan 2; Overload generator fan 3; Overload generator heating,0.001,0.999,False,True,0.164,False,False,0.000,False,True,0.219
+6,gen,2020-07-15 08:14:59+00:00,2020-07-15 13:23:34+00:00,Overload generator fan 1; Overload generator heating,0.116,0.029,False,False,0.164,False,False,0.000,False,False,0.219
+6,gen,2021-01-20 10:12:36+00:00,2021-01-21 10:28:19+00:00,Manual operation generator fan 1; Overload generator fan 1; Overload generator heating,0.331,0.981,False,True,0.164,False,False,0.000,False,False,0.219
+6,gen,2021-03-01 10:56:19+00:00,2021-03-01 10:56:19+00:00,Overload generator heating,0.981,0.291,True,False,0.164,False,False,0.000,False,False,0.219
+6,gen,2021-05-27 06:40:45+00:00,2021-05-27 06:40:45+00:00,Overload generator fan 1,0.009,0.004,False,False,0.164,False,False,0.000,False,False,0.219
+6,gen,2021-06-23 09:34:20+00:00,2021-06-23 09:34:20+00:00,Overload generator heating,0.003,0.006,False,False,0.164,False,False,0.000,False,False,0.219
+6,gen,2021-09-17 10:22:31+00:00,2021-09-17 10:22:31+00:00,Overload generator heating,0.001,0.001,False,False,0.164,False,False,0.000,False,False,0.219
+6,gen,2021-11-11 13:10:47+00:00,2021-11-11 13:10:47+00:00,Overload generator fan 1,0.001,0.014,False,False,0.164,False,False,0.000,False,False,0.219
+1,gear,2019-02-24 16:46:28+00:00,2019-02-24 16:46:28+00:00,Oil filter gear choked,0.000,0.000,False,False,0.000,False,False,0.000,False,False,0.000
+1,gear,2019-04-09 10:09:03+00:00,2019-04-09 10:09:03+00:00,Oil filter gear choked,0.000,0.002,False,False,0.000,False,False,0.000,False,False,0.000
+1,gear,2019-05-28 20:55:45+00:00,2019-05-28 20:55:45+00:00,Oil filter gear choked,0.006,0.006,False,False,0.000,False,False,0.000,False,False,0.000
+1,gear,2021-03-05 17:38:05+00:00,2021-03-05 17:38:05+00:00,Manual operation fan gear,0.001,0.001,False,False,0.000,False,False,0.000,False,False,0.000
+4,gear,2021-05-14 14:02:14+00:00,2021-05-14 14:02:14+00:00,Manual operation gear oil pump,0.001,0.001,False,False,0.000,False,False,0.000,False,False,0.000
+6,gear,2020-12-24 05:14:40+00:00,2020-12-24 05:14:40+00:00,High temp. gear bearing 1,0.001,0.001,False,False,0.000,False,False,0.000,False,False,0.000
+6,gear,2021-01-21 08:08:49+00:00,2021-01-21 08:08:49+00:00,High temp. gear bearing 1,0.001,0.006,False,False,0.000,False,False,0.000,False,False,0.000
+6,gear,2021-03-27 05:18:50+00:00,2021-03-27 05:18:50+00:00,High temp. gear bearing 1,0.012,0.002,False,False,0.000,False,False,0.000,False,False,0.000
+6,gear,2021-12-03 06:21:34+00:00,2021-12-03 06:21:34+00:00,High temp. gear bearing 1,0.001,0.002,False,False,0.000,False,False,0.000,False,False,0.000
+1,eff,2020-03-26 16:27:51+00:00,2020-03-26 16:27:51+00:00,Pitch measuring system 1><2,0.009,0.010,False,False,0.000,False,False,0.164,False,False,0.000
+1,eff,2020-05-26 10:27:26+00:00,2020-05-26 10:36:05+00:00,Limit switch error 95° axis 1; Limit switch error 95° axis 2; Limit switch error 95° axis 3,0.022,0.139,False,False,0.000,False,False,0.164,False,False,0.000
+1,eff,2020-12-03 12:50:49+00:00,2020-12-03 12:50:49+00:00,Pitch measuring system 1><2,0.043,0.074,False,False,0.000,False,False,0.164,False,False,0.000
+1,eff,2021-03-06 12:10:26+00:00,2021-03-06 17:41:45+00:00,Limit switch error 95° axis 1; Limit switch error 95° axis 2; Limit switch error 95° axis 3; Pitch measuring system 1><2,0.320,0.320,False,False,0.000,True,True,0.164,False,False,0.000
+1,eff,2021-09-06 13:48:07+00:00,2021-09-06 13:48:07+00:00,Pitch batteries charging cycle,0.365,0.365,False,False,0.000,False,False,0.164,False,False,0.000
+2,eff,2020-05-27 09:56:09+00:00,2020-05-27 10:04:58+00:00,Limit switch error 95° axis 1; Limit switch error 95° axis 2; Limit switch error 95° axis 3,0.180,0.210,False,False,0.000,False,False,0.109,False,False,0.000
+2,eff,2020-07-29 13:59:22+00:00,2020-07-29 13:59:22+00:00,Pitch batteries charging cycle,0.210,0.066,False,False,0.000,False,False,0.109,False,False,0.000
+2,eff,2021-03-08 08:59:16+00:00,2021-03-08 13:11:02+00:00,Limit switch error 95° axis 2; Pitch measuring system 1><2,0.090,0.090,False,False,0.000,False,False,0.109,False,False,0.000
+2,eff,2021-09-08 10:45:45+00:00,2021-09-08 10:45:45+00:00,Pitch batteries charging cycle,0.078,0.117,False,False,0.000,False,True,0.109,False,False,0.000
+2,eff,2021-11-28 04:30:44+00:00,2021-11-28 04:58:03+00:00,Wind < power,0.036,0.013,False,False,0.000,False,False,0.109,False,False,0.000
+3,eff,2020-03-30 17:03:16+00:00,2020-03-31 08:57:20+00:00,Error pitch converter 2; Limit switch error 95° axis 2,0.232,0.018,False,False,0.000,False,False,0.000,False,False,0.000
+3,eff,2020-11-01 17:03:44+00:00,2020-11-01 17:03:44+00:00,Pitch batteries charging cycle,0.044,0.031,False,False,0.000,False,False,0.000,False,False,0.000
+3,eff,2021-09-09 10:53:12+00:00,2021-09-09 10:53:12+00:00,Pitch batteries charging cycle,0.020,0.023,False,False,0.000,False,False,0.000,False,False,0.000
+5,eff,2019-08-01 08:46:12+00:00,2019-08-01 08:46:12+00:00,Limit switch error 95° axis 2,0.058,0.124,False,False,0.000,False,False,0.055,False,False,0.000
+5,eff,2020-07-13 13:24:08+00:00,2020-07-13 13:24:44+00:00,Limit switch error 95° axis 1; Limit switch error 95° axis 2; Limit switch error 95° axis 3,0.013,0.011,False,False,0.000,False,False,0.055,False,False,0.000
+5,eff,2021-03-13 13:36:37+00:00,2021-03-13 13:36:37+00:00,Pitch too slow BP180,0.090,0.039,False,False,0.000,False,True,0.055,False,False,0.000
+5,eff,2021-09-16 10:15:37+00:00,2021-09-16 11:15:37+00:00,Pitch batteries charging cycle,0.021,0.106,False,False,0.000,False,False,0.055,False,False,0.000
+6,eff,2019-07-19 13:19:53+00:00,2019-07-19 13:19:53+00:00,Pitch batteries charging cycle,0.023,0.026,False,False,0.000,False,False,0.000,False,False,0.000
+6,eff,2020-07-15 09:48:53+00:00,2020-07-15 09:49:30+00:00,Limit switch error 95° axis 1; Limit switch error 95° axis 2; Limit switch error 95° axis 3,0.038,0.015,False,False,0.000,False,False,0.000,False,False,0.000
+6,eff,2021-01-17 06:30:19+00:00,2021-01-17 06:30:19+00:00,Pitch too slow BP180,0.063,0.103,False,False,0.000,False,False,0.000,False,False,0.000
+6,eff,2021-09-17 11:49:19+00:00,2021-09-17 12:49:20+00:00,Pitch batteries charging cycle,0.039,0.065,False,False,0.000,False,False,0.000,False,False,0.000
+1,derate,2019-02-03 04:00:30+00:00,2019-02-03 04:00:30+00:00,Icing (dev. electr. power),0.010,0.015,False,False,0.000,False,False,0.109,False,False,0.000
+1,derate,2021-12-22 03:28:18+00:00,2021-12-22 03:28:18+00:00,Icing (dev. electr. power),0.056,0.015,False,False,0.000,True,False,0.109,False,False,0.000
+2,derate,2021-02-01 00:35:29+00:00,2021-02-01 00:35:29+00:00,Icing (dev. electr. power),0.016,0.012,False,False,0.000,False,False,0.055,False,False,0.000
+3,derate,2020-12-28 11:57:56+00:00,2020-12-28 11:57:56+00:00,Icing (dev. electr. power),0.042,0.015,False,False,0.000,False,False,0.000,False,False,0.000
+3,derate,2021-02-01 00:29:57+00:00,2021-02-01 00:29:57+00:00,Icing (dev. electr. power),0.042,0.013,False,False,0.000,False,False,0.000,False,False,0.000
+4,derate,2019-11-14 18:39:44+00:00,2019-11-14 18:39:44+00:00,Reduced power converter,0.046,0.017,False,False,0.000,False,False,0.055,False,False,0.000
+5,derate,2021-02-01 00:40:24+00:00,2021-02-01 00:40:24+00:00,Icing (dev. electr. power),0.055,0.014,False,False,0.000,False,True,0.055,False,False,0.000

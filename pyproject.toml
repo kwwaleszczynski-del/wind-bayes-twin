@@ -1,0 +1,37 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "wind-bayes-twin"
+version = "0.1.0"
+description = "Bayesian digital twin of a wind farm: hidden turbine health parameters with uncertainty, fault probabilities, lost energy by cause and value-of-information inspection ranking, validated on open Kelmarsh SCADA data."
+readme = "README.md"
+requires-python = ">=3.11"
+license = { text = "MIT" }
+dependencies = [
+    "numpy>=1.26",
+    "pandas>=2.1",
+    "pyarrow>=14",
+    "scipy>=1.11",
+    "matplotlib>=3.8",
+    "py_wake>=2.6",
+    "jax>=0.4.30",
+    "numpyro>=0.15",
+]
+
+[project.optional-dependencies]
+dev = ["pytest>=8"]
+
+[project.scripts]
+wind-bayes-twin = "wind_bayes_twin.cli:main"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.setuptools.package-data]
+wind_bayes_twin = ["dashboard.html"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+pythonpath = ["src"]

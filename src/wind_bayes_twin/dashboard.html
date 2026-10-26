@@ -1,0 +1,277 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Kelmarsh Bayesian twin</title>
+<meta name="description" content="Bayesian digital twin of the Kelmarsh wind farm (open SCADA data): hidden health parameters of every turbine with credible intervals, fault probabilities, lost energy by cause, inspection ranking and replays of injected faults.">
+<style>
+:root {
+  color-scheme: light;
+  --page: #f9f9f7; --surface: #fcfcfb; --ink: #0b0b0b; --ink2: #52514e; --muted: #898781;
+  --grid: #e1e0d9; --axis: #c3c2b7; --border: rgba(11,11,11,0.10); --critical: #d03b3b; --accent: #2a78d6;
+  --band: rgba(42,120,214,0.18); --good: #1b9e77;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    color-scheme: dark;
+    --page: #0d0d0d; --surface: #1a1a19; --ink: #f0efec; --ink2: #c3c2b7; --muted: #898781;
+    --grid: #2c2c2a; --axis: #383835; --border: rgba(255,255,255,0.10); --critical: #e66767; --accent: #3987e5;
+    --band: rgba(57,135,229,0.25); --good: #3cc29a;
+  }
+}
+:root[data-theme="dark"] {
+  color-scheme: dark;
+  --page: #0d0d0d; --surface: #1a1a19; --ink: #f0efec; --ink2: #c3c2b7; --muted: #898781;
+  --grid: #2c2c2a; --axis: #383835; --border: rgba(255,255,255,0.10); --critical: #e66767; --accent: #3987e5;
+  --band: rgba(57,135,229,0.25); --good: #3cc29a;
+}
+* { box-sizing: border-box; }
+body { margin: 0; background: var(--page); color: var(--ink);
+       font: 15px/1.5 system-ui, -apple-system, "Segoe UI", sans-serif; }
+main { max-width: 1180px; margin: 0 auto; padding: 24px 16px 48px; }
+h1 { font-size: 26px; margin: 0 0 6px; font-weight: 650; }
+h2 { font-size: 17px; margin: 0 0 4px; font-weight: 600; }
+p { margin: 0 0 10px; color: var(--ink2); max-width: 900px; }
+.card { background: var(--surface); border: 1px solid var(--border); border-radius: 10px; padding: 16px;
+        margin-top: 16px; }
+.controls { display: flex; flex-wrap: wrap; gap: 12px 20px; align-items: center; margin: 8px 0; }
+label { font-size: 14px; color: var(--ink2); display: flex; gap: 8px; align-items: center; }
+select, button { font: inherit; color: var(--ink); background: var(--surface); border: 1px solid var(--border);
+         border-radius: 6px; padding: 4px 10px; }
+button { cursor: pointer; }
+input[type=range] { width: min(420px, 60vw); }
+.plot { width: 100%; }
+table { border-collapse: collapse; font-size: 14px; font-variant-numeric: tabular-nums; width: 100%; }
+th, td { text-align: right; padding: 4px 8px; border-bottom: 1px solid var(--grid); }
+th:nth-child(-n+2), td:nth-child(-n+2) { text-align: left; }
+th { color: var(--ink2); font-weight: 600; }
+.note { font-size: 13px; color: var(--muted); }
+a { color: inherit; }
+.sticky { position: sticky; top: 0; z-index: 5; background: var(--page); padding: 8px 0; }
+</style>
+</head>
+<body>
+<main>
+  <h1>A Bayesian twin of the Kelmarsh wind farm</h1>
+  <p>Six Senvion MM92 turbines, open 10-minute SCADA data 2019-2021, unmodified. For every turbine and day the twin
+     estimates hidden health parameters (efficiency, anemometer error, static yaw offset, derating, thermal resistance
+     of the gearbox and generator bearings) with credible intervals, the probability of each fault type, the energy
+     each cause costs and which inspection is worth most. Faults are judged against the turbine's own healthy
+     behaviour in 2018.</p>
+
+  <div class="controls sticky">
+    <label>Turbine <select id="turbine"></select></label>
+  </div>
+
+  <section class="card">
+    <h2>Fault probabilities</h2>
+    <p class="note">Posterior probability that a fault of each type is present and material (worth acting on).
+       Dashed: alarm threshold 0.9. Vertical lines: related messages in the turbine's status log (hover for text).</p>
+    <div id="probs" class="plot" style="height:330px"></div>
+  </section>
+
+  <section class="card">
+    <h2>Health parameters</h2>
+    <p class="note">Posterior mean and 90 % credible interval, relative to the turbine's healthy behaviour in 2018.</p>
+    <div id="params" class="plot" style="height:900px"></div>
+  </section>
+
+  <section class="card">
+    <h2>Energy by cause</h2>
+    <div class="controls"><label>Year <select id="year"></select></label></div>
+    <p class="note">Whole farm. Potential: the energy the turbines would have produced, healthy and available, from
+       their neighbours' wind and the wake model. Blue steps: health causes estimated by the twin (posterior mean).
+       Value at an assumed £50/MWh.</p>
+    <div id="waterfall" class="plot" style="height:380px"></div>
+  </section>
+
+  <section class="card">
+    <h2>Inspection ranking</h2>
+    <div class="controls"><label>Decision date <select id="qdate"></select></label></div>
+    <p class="note">Expected avoided loss of inspecting now and fixing what is found, over a 180-day horizon (until
+       the next scheduled service), net of inspection (£500) and repair costs; EVPI: the part of it that comes from
+       resolving uncertainty. Energy at £50/MWh; bearing cooling faults priced by an illustrative failure risk. All
+       costs are assumptions (README). Negative: monitoring is cheaper than sending a crew.</p>
+    <div style="overflow-x:auto"><table id="ranking"></table></div>
+  </section>
+
+  <section class="card">
+    <h2>Replay of an injected fault</h2>
+    <div class="controls">
+      <label>Fault <select id="replay"></select></label>
+      <button id="play">Play</button>
+      <input id="slider" type="range" min="0" max="1" value="1">
+      <span id="dayLabel" class="note"></span>
+    </div>
+    <p class="note" id="replayNote"></p>
+    <div id="rprobs" class="plot" style="height:260px"></div>
+    <div id="rparam" class="plot" style="height:260px"></div>
+    <p class="note">Inspection values on the last day of the replay (same assumptions as the ranking above):</p>
+    <div style="overflow-x:auto"><table id="rdecisions"></table></div>
+  </section>
+
+  <p class="note" style="margin-top:16px">Data: Kelmarsh wind farm data, C. Plumley and R. Takeuchi (Cubico Sustainable
+     Investments), <a href="https://doi.org/10.5281/zenodo.16807551">doi:10.5281/zenodo.16807551</a>, CC BY 4.0.
+     Code: <a href="https://github.com/kwwaleszczynski-del/wind-bayes-twin">wind-bayes-twin</a>.</p>
+</main>
+<script src="https://cdn.jsdelivr.net/npm/plotly.js-dist-min@2.35.2/plotly.min.js"
+        integrity="sha384-cCVCZkAjYNxaYKbM8lsArLznDF/SvMFr1jcZrvOpSTCa0W40ZAdLzHCEulnUa5i7" crossorigin="anonymous"></script>
+<script>
+const D = /*__DATA__*/null;
+const css = n => getComputedStyle(document.documentElement).getPropertyValue(n).trim();
+const cfg = {displayModeBar: false, responsive: true};
+const turbSel = document.getElementById("turbine");
+D.turbines.forEach(t => turbSel.add(new Option("Turbine " + t, t)));
+const start = new Date(D.start + "T00:00:00Z");
+const nDays = D.series[String(D.turbines[0])].p_eff.length;
+const days = Array.from({length: nDays}, (_, i) => new Date(start.getTime() + i * 864e5).toISOString().slice(0, 10));
+const scale = {eff: 100, anemo7: 100, yaw: 1, derate: 100, gear: 100, gen: 100};
+const unit = {eff: " %", anemo7: " %", yaw: "°", derate: " %", gear: " %", gen: " %"};
+
+function base(extra) {
+  return Object.assign({paper_bgcolor: css("--surface"), plot_bgcolor: css("--surface"),
+    font: {family: 'system-ui, -apple-system, "Segoe UI", sans-serif', color: css("--ink2"), size: 12},
+    margin: {l: 60, r: 20, t: 10, b: 36}, showlegend: false}, extra || {});
+}
+const axis = extra => Object.assign({gridcolor: css("--grid"), zerolinecolor: css("--axis"), color: css("--ink2")}, extra);
+
+function eventShapes(t, faults, yref) {
+  return D.events.filter(e => e.turbine === t && (!faults || faults.includes(e.fault))).map(e => ({
+    type: "line", xref: "x", yref: yref, x0: days[e.day], x1: days[e.day], y0: 0, y1: 1,
+    line: {color: css("--critical"), width: 1}, opacity: 0.6}));
+}
+function eventHover(t, faults, yaxis, y) {
+  const ev = D.events.filter(e => e.turbine === t && (!faults || faults.includes(e.fault)));
+  return {type: "scatter", mode: "markers", x: ev.map(e => days[e.day]), y: ev.map(() => y), yaxis: yaxis,
+    marker: {size: 10, color: "rgba(0,0,0,0)"}, showlegend: false, hovertemplate: ev.map(e => e.fault + ": " + e.messages + "<extra></extra>")};
+}
+
+function drawProbs() {
+  const t = +turbSel.value, s = D.series[String(t)];
+  const traces = D.faults.map(f => ({type: "scatter", mode: "lines", x: days, y: s["p_" + f.key], name: f.label,
+    line: {color: f.color, width: 1.5}, hovertemplate: f.label + "<br>%{x}<br>P %{y:.2f}<extra></extra>"}));
+  traces.push(eventHover(t, null, "y", 1.02));
+  const shapes = eventShapes(t, null, "y domain");
+  shapes.push({type: "line", xref: "paper", x0: 0, x1: 1, y0: 0.9, y1: 0.9, line: {color: css("--muted"), dash: "dash", width: 1}});
+  Plotly.react("probs", traces, base({showlegend: true, legend: {orientation: "h", y: -0.15}, shapes: shapes,
+    xaxis: axis({type: "date"}), yaxis: axis({range: [-0.02, 1.05], title: {text: "P(material fault)"}})}), cfg);
+}
+
+function drawParams() {
+  const t = +turbSel.value, s = D.series[String(t)];
+  const traces = [], layout = base({annotations: [], shapes: []});
+  const n = D.params.length, gap = 0.04, h = (1 - gap * (n - 1)) / n;
+  const faultOf = {eff: "eff", anemo7: "anemo", yaw: "yaw", derate: "derate", gear: "gear", gen: "gen"};
+  D.params.forEach((p, k) => {
+    const ax = k === 0 ? "" : String(k + 1), sc = scale[p.key];
+    const lo = s["q05_" + p.key].map(v => v === null ? null : v * sc), hi = s["q95_" + p.key].map(v => v === null ? null : v * sc);
+    traces.push({type: "scatter", mode: "lines", x: days, y: hi, yaxis: "y" + ax, line: {width: 0}, hoverinfo: "skip"});
+    traces.push({type: "scatter", mode: "lines", x: days, y: lo, yaxis: "y" + ax, line: {width: 0}, fill: "tonexty",
+      fillcolor: css("--band"), hoverinfo: "skip"});
+    traces.push({type: "scatter", mode: "lines", x: days, y: s["mean_" + p.key].map(v => v === null ? null : v * sc),
+      yaxis: "y" + ax, line: {color: css("--accent"), width: 1.5},
+      hovertemplate: p.label + "<br>%{x}<br>%{y:.2f}" + unit[p.key] + "<extra></extra>"});
+    const top = 1 - k * (h + gap);
+    layout["yaxis" + ax] = axis({domain: [top - h, top], zeroline: true});
+    layout.annotations.push({text: p.label + (unit[p.key] === " %" ? " [%]" : ""), xref: "paper", yref: "paper",
+      x: 0, y: top + 0.012, xanchor: "left", yanchor: "bottom", showarrow: false, font: {size: 12, color: css("--ink")}});
+    layout.shapes.push(...eventShapes(t, [faultOf[p.key]], "y" + ax + " domain"));
+  });
+  layout.xaxis = axis({type: "date", anchor: "y" + n});
+  layout.margin.t = 20;
+  Plotly.react("params", traces, layout, cfg);
+}
+
+const yearSel = document.getElementById("year");
+Object.keys(D.waterfall).forEach(y => yearSel.add(new Option(y, y)));
+yearSel.value = Object.keys(D.waterfall).slice(-1)[0];
+function drawWaterfall() {
+  const w = D.waterfall[yearSel.value];
+  const steps = [["downtime", "downtime"], ["curtailment_icing", "curtailment, icing"], ["no_data_sensor", "no data"],
+    ["health_eff", "efficiency loss"], ["health_yaw", "yaw misalignment"], ["health_derate", "derating"],
+    ["performance_other", "other performance"], ["unassigned", "unassigned"]];
+  const x = ["potential", ...steps.map(s => s[1]), "actual"];
+  const y = [w.potential, ...steps.map(s => -w[s[0]]), w.actual];
+  const measure = ["absolute", ...steps.map(() => "relative"), "total"];
+  Plotly.react("waterfall", [{type: "waterfall", x: x, y: y, measure: measure,
+    text: y.map((v, i) => i === 0 || i === y.length - 1 ? v.toFixed(0) : v.toFixed(0) + " MWh<br>£" + (v * 50 / 1000).toFixed(1) + "k"),
+    textposition: "outside", connector: {line: {color: css("--axis")}},
+    increasing: {marker: {color: css("--good")}}, decreasing: {marker: {color: css("--muted")}},
+    totals: {marker: {color: css("--ink2")}}, hovertemplate: "%{x}<br>%{y:.1f} MWh<extra></extra>"}],
+    base({yaxis: axis({title: {text: "MWh"}, range: [w.actual * 0.85, w.potential * 1.05]}), xaxis: axis({})}), cfg);
+}
+
+const qSel = document.getElementById("qdate");
+Object.keys(D.decisions).forEach(d => qSel.add(new Option(d, d)));
+qSel.value = Object.keys(D.decisions).slice(-1)[0];
+const fLabel = Object.fromEntries(D.faults.map(f => [f.key, f.label]));
+function drawRanking() {
+  const rows = D.decisions[qSel.value].slice(0, 12).map(r => "<tr><td>T" + r.turbine + "</td><td>" + fLabel[r.fault] +
+    "</td><td>" + r.p_fault.toFixed(2) + "</td><td>" + r.cost_rate_per_day.toFixed(1) + "</td><td>" +
+    Math.round(r.expected_loss).toLocaleString("en-GB") + "</td><td>" + Math.round(r.value_of_inspection).toLocaleString("en-GB") +
+    "</td><td>" + Math.round(r.evpi).toLocaleString("en-GB") + "</td></tr>").join("");
+  document.getElementById("ranking").innerHTML = "<thead><tr><th>Turbine</th><th>Fault</th><th>P(fault)</th>" +
+    "<th>Cost £/day</th><th>Expected loss £ (180 d)</th><th>Value of inspecting £</th><th>EVPI £</th></tr></thead><tbody>" +
+    rows + "</tbody>";
+}
+
+const repSel = document.getElementById("replay"), slider = document.getElementById("slider");
+D.replays.forEach((r, i) => repSel.add(new Option("T" + r.turbine + ": " + r.scenario + " (" + r.start + ")", i)));
+let timer = null;
+function drawReplay() {
+  const r = D.replays[+repSel.value], k = +slider.value, sc = scale[r.param];
+  slider.max = r.rel.length - 1;
+  const x = r.rel.slice(0, k + 1);
+  const firstTwin = r.twin_alarms.find(a => a[0] >= 0), firstChart = r.charts.find(a => a[0] >= 0);
+  document.getElementById("dayLabel").textContent = "day " + r.rel[k] + " from onset";
+  document.getElementById("replayNote").textContent = "Twin alarm on day " + (firstTwin ? firstTwin[0] + " (" + fLabel[firstTwin[1]] + ")" : "none") +
+    "; WARP/NBM chart alarm on day " + (firstChart ? firstChart[0] : "none") + ". Injected value: " +
+    (r.truth * sc).toFixed(2) + unit[r.param] + (r.ramp ? " (reached after " + r.ramp + " days)" : "") + ".";
+  const tp = D.faults.map(f => ({type: "scatter", mode: "lines", x: x, y: r["p_" + f.key].slice(0, k + 1),
+    line: {color: f.color, width: f.key === r.fault ? 2.2 : 1}, name: f.label,
+    hovertemplate: f.label + "<br>day %{x}<br>P %{y:.2f}<extra></extra>"}));
+  const xr = [r.rel[0], r.rel[r.rel.length - 1]];
+  const marks = [{type: "line", x0: 0, x1: 0, yref: "paper", y0: 0, y1: 1, line: {color: css("--ink2"), width: 1}}];
+  if (firstTwin && firstTwin[0] <= r.rel[k]) marks.push({type: "line", x0: firstTwin[0], x1: firstTwin[0], yref: "paper", y0: 0, y1: 1, line: {color: css("--accent"), dash: "dot"}});
+  if (firstChart && firstChart[0] <= r.rel[k]) marks.push({type: "line", x0: firstChart[0], x1: firstChart[0], yref: "paper", y0: 0, y1: 1, line: {color: "#e3913b", dash: "dot"}});
+  Plotly.react("rprobs", tp, base({xaxis: axis({range: xr}), yaxis: axis({range: [-0.02, 1.05], title: {text: "P(fault)"}}),
+    shapes: marks.concat([{type: "line", xref: "paper", x0: 0, x1: 1, y0: 0.9, y1: 0.9, line: {color: css("--muted"), dash: "dash", width: 1}}])}), cfg);
+  const truth = x.map(d => d < 0 ? 0 : r.truth * sc * (r.ramp ? Math.min(1, d / r.ramp) : 1));
+  const g = q => r[q + "_" + r.param].slice(0, k + 1).map(v => v === null ? null : v * sc);
+  Plotly.react("rparam", [
+    {type: "scatter", mode: "lines", x: x, y: g("q95"), line: {width: 0}, hoverinfo: "skip"},
+    {type: "scatter", mode: "lines", x: x, y: g("q05"), line: {width: 0}, fill: "tonexty", fillcolor: css("--band"), hoverinfo: "skip"},
+    {type: "scatter", mode: "lines", x: x, y: g("mean"), line: {color: css("--accent"), width: 2}, hovertemplate: "day %{x}<br>posterior mean %{y:.2f}<extra></extra>"},
+    {type: "scatter", mode: "lines", x: x, y: truth, line: {color: css("--ink"), dash: "dash", width: 1.2}, hovertemplate: "injected %{y:.2f}<extra></extra>"}],
+    base({xaxis: axis({range: xr, title: {text: "days from fault onset"}}), yaxis: axis({title: {text: D.params.find(p => p.key === r.param).label}}), shapes: marks}), cfg);
+  document.getElementById("rdecisions").innerHTML = "<thead><tr><th>Turbine</th><th>Fault</th><th>P(fault)</th>" +
+    "<th>Cost £/day</th><th>Expected loss £ (180 d)</th><th>Value of inspecting £</th><th>EVPI £</th></tr></thead><tbody>" +
+    r.decisions.slice(0, 3).map(d => "<tr><td>T" + r.turbine + "</td><td>" + fLabel[d.fault] + "</td><td>" + d.p_fault.toFixed(2) +
+      "</td><td>" + d.cost_rate_per_day.toFixed(1) + "</td><td>" + Math.round(d.expected_loss).toLocaleString("en-GB") +
+      "</td><td>" + Math.round(d.value_of_inspection).toLocaleString("en-GB") + "</td><td>" + Math.round(d.evpi).toLocaleString("en-GB") +
+      "</td></tr>").join("") + "</tbody>";
+}
+repSel.addEventListener("change", () => { slider.value = D.replays[+repSel.value].rel.length - 1; drawReplay(); });
+slider.addEventListener("input", drawReplay);
+document.getElementById("play").addEventListener("click", () => {
+  if (timer) { clearInterval(timer); timer = null; document.getElementById("play").textContent = "Play"; return; }
+  if (+slider.value >= +slider.max) slider.value = 0;
+  document.getElementById("play").textContent = "Pause";
+  timer = setInterval(() => {
+    if (+slider.value >= +slider.max) { clearInterval(timer); timer = null; document.getElementById("play").textContent = "Play"; return; }
+    slider.value = +slider.value + 1; drawReplay();
+  }, 80);
+});
+
+function drawTurbine() { drawProbs(); drawParams(); }
+turbSel.addEventListener("change", drawTurbine);
+yearSel.addEventListener("change", drawWaterfall);
+qSel.addEventListener("change", drawRanking);
+slider.max = D.replays[0].rel.length - 1; slider.value = slider.max;
+function drawAll() { drawTurbine(); drawWaterfall(); drawRanking(); drawReplay(); }
+drawAll();
+matchMedia("(prefers-color-scheme: dark)").addEventListener("change", drawAll);
+</script>
+</body>
+</html>

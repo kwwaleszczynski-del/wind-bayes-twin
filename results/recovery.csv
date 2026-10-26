@@ -1,0 +1,14 @@
+scenario,truth (abs),median estimate (abs),median error,90% CI coverage,median CI width,median onset error [d]
+yaw 4°,4,3.89,-0.1102,0.875,2.427,0
+yaw 8°,8,7.89,-0.1105,0.8958,2.402,-2
+yaw drift to 8° (60 d),8,7.677,-0.3226,0.8542,2.429,-16.5
+anemometer ±3 %,0.03001,0.02578,-0.004234,0.7708,0.03473,1
+anemometer drift to ±5 % (60 d),0.05004,0.04367,-0.00544,0.8125,0.03212,-12
+efficiency -2 %,0.0202,0.005502,-0.0147,0.7708,0.02693,17.5
+efficiency -5 %,0.05129,0.04632,-0.004972,0.9375,0.05816,-0.5
+efficiency drift to -5 % (60 d),0.05129,0.04267,-0.00862,0.9167,0.05469,-13
+derating to 95 %,0.05,0.03884,-0.01116,1,0.05,
+gear bearing cooling +15 %,0.15,0.1519,0.001857,0.8958,0.03536,-2
+gear bearing cooling +25 %,0.25,0.2518,0.001841,0.875,0.03544,-1
+generator bearing cooling +15 %,0.15,0.1465,-0.003532,0.75,0.1057,31
+generator bearing cooling +25 %,0.25,0.2462,-0.003791,0.7292,0.1034,-2

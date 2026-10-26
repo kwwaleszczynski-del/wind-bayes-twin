@@ -1,0 +1,56 @@
+{
+ "engine": "particle",
+ "runs": 624,
+ "overall": {
+  "twin": {
+   "detected": 0.9038461538461539,
+   "median_days": 25.0,
+   "right_cause_of_detected": 0.9202127659574468,
+   "chance": 0.0625
+  },
+  "WARP": {
+   "detected": 0.7291666666666666,
+   "median_days": 24.0,
+   "right_cause_of_detected": 0.6285714285714286,
+   "chance": 0.25
+  },
+  "NBM": {
+   "detected": 0.4342948717948718,
+   "median_days": 22.0,
+   "right_cause_of_detected": 0.6900369003690037,
+   "chance": 0.1875
+  },
+  "WARP + NBM": {
+   "detected": 0.9711538461538461,
+   "median_days": 20.5,
+   "right_cause_of_detected": 0.7244224422442245,
+   "chance": 0.3958333333333333
+  }
+ },
+ "false_alarms_per_turbine_year": {
+  "twin eff": 0.0,
+  "twin anemo": 0.0,
+  "twin yaw": 0.0,
+  "twin derate": 0.0,
+  "twin gear": 0.0,
+  "twin gen": 0.25,
+  "WARP": 1.083,
+  "NBM": 0.999,
+  "WARP + NBM": 2.082,
+  "twin (all types)": 0.25
+ },
+ "campaign_seconds": 549.0,
+ "workers": 6,
+ "clean_run_seconds_per_turbine": [
+  31.0,
+  32.8,
+  30.1,
+  31.7,
+  29.6,
+  28.0
+ ],
+ "clean_run_days": 1096,
+ "injection_run_seconds_median": 2.61,
+ "particles": 2000,
+ "guided": false
+}
