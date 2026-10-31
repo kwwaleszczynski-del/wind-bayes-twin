@@ -38,6 +38,11 @@ same injected faults.
 | chance of an alarm in a 90-day window without a fault | 10 % | 40 % |
 | fault size with a 90 % credible interval, onset date | yes | no |
 
+**Read the right-cause rate as an upper bound.** Every injected fault is one of the twin's own six fault types, one
+at a time, injected with nearly the physics of its observation model (a cos² yaw law driven by the vane, a pure
+anemometer scale error, a hard power cap, a proportional cooling loss). Real faults come and go, mix, and need not
+belong to that list; the 95 % does not cover them. The charts face the same injections.
+
 - **At the same false-alarm rate the twin detects as much, and names the cause far more often.** Moving each system's
   alarm threshold traces its trade-off: at about one false alarm per turbine-year both detect 93-94 % of the faults,
   but the twin's first alarm names the right cause in 86 % of all faults against 74 % for the charts. The charts' weak
@@ -229,7 +234,7 @@ effective sample size of 1000.
   independent check of the factorisation and as the general tool if the model became more nonlinear.
 - **Hierarchical priors** because one healthy year per turbine is too little to set seven noise models independently,
   and too much to ignore that turbines differ.
-- **Everything on a laptop CPU**: see [Computational cost](#computational-cost).
+- **Everything on a laptop CPU**: see [Computational cost](docs/engines.md#computational-cost).
 
 ## Outputs
 
@@ -431,51 +436,13 @@ yaw (P = 0.95, £2.6/day; an inspection and recalibration for £1,100 would pay 
 The same rule does recommend an inspection in the replays of injected faults with a material cost: a 5 % efficiency
 drift on T1 (+£2.5k on day 90) and a 25 % generator cooling loss on T5 (+£1.3k), but not a 4° yaw offset (-£430).
 
-## Two engines, one model
+## Engines and computational cost
 
-The whole validation was run with both inference engines on the same model, noise model and injected faults:
-
-| | Run-length + Kalman (primary) | Joint particle filter, guided | Joint particle filter, unguided |
-|---|---|---|---|
-| detected within 90 days | 88.8 % | 90.2 % | 90.4 % |
-| median days to detection | 24 | 24 | 25 |
-| first alarm names the right cause | 95 % | 93 % | 92 % |
-| false alarms per turbine-year | 0.50 | 0.42 | 0.25 |
-| efficiency -2 % / derating 5 % detected | 29 % / 88 % | 38 % / 92 % | 40 % / 92 % |
-| 90 % interval coverage: yaw / gearbox / generator | 88-90 % / 88-90 % / 73-75 % | 85-90 % / 88 % / 71-73 % | 85-92 % / 85-88 % / 67-69 % |
-| seconds per 90-day injection run (median) | 1.5 | 2.6 | 2.6 |
-
-The two engines agree to within a few points on every scenario, which checks the factorisation into blocks and the
-plug-in coupling of yaw and power: an approximation that mattered would show up as a gap. The particle filter is
-slightly more sensitive to power-curve faults - it can hold an efficiency loss and a derating at the same time and
-needs no plug-in - and slightly worse on the generator bearing, where Monte Carlo error adds to a noisy residual.
-
-Without the change-point guidance (bootstrap proposals only) the particle filter targets the same posterior and
-detects as many faults, but later after a step and with less precise sizes right after it: a 4° yaw offset is flagged
-after 14 days instead of 8 (an 8° one after 6 instead of 4), a derating is named correctly in 66 % instead of 77 % of
-the cases, and the intervals of a 3 % anemometer step cover the truth in 60 % instead of 75 % - few particles sit near
-the new value when the jump happens. It raises fewer false alarms (0.25 per turbine-year), because the guidance also
-follows changes that turn out to be wander. The detector buys Monte Carlo efficiency where a bootstrap filter is
-weakest, just after a jump, without changing what the filter estimates.
-
-## Computational cost
-
-Laptop: Intel i7-10850H (6 cores), 64 GB RAM, Windows, Python 3.13; the campaigns shared the CPU with another job.
-
-| Step | Time |
-|---|---|
-| read five yearly archives (1.6 million 10-minute turbine records) into Parquet | 83 s |
-| `prepare`: wake tables (PyWake), reference fit and prediction, RC fits, daily statistics | 3 min |
-| `calibrate`: NUTS for 7 statistics x 2 chains x 1200 iterations (Kalman likelihood in `lax.scan`) | 11-19 min |
-| run-length engine: one turbine-day, five blocks, ~1,000-2,000 hypotheses | ~20 ms |
-| ... with daily credible intervals and Shapley loss attribution | 40-80 ms |
-| joint particle filter, 2000 particles: one turbine-day | ~40 ms |
-| `validate`: 6 clean runs 2019-2021 + 624 injection runs, 6 processes | 9-12 min per engine |
-| `cases` (logs, quarterly decisions) and `report` | 2 min |
-
-Memory is about 0.5 GB per process (the prepared 10-minute data of five years). Everything after `prepare` reads only
-the daily statistics and the records behind the power statistics, so the online part would run on a farm's SCADA
-server in real time with room to spare.
+The whole validation was run with both inference engines on the same model, noise model and injected faults; they agree
+within a few points on every scenario (detected 88.8 % and 90.2 %, right cause 95 % and 93 %, false alarms 0.50 and
+0.42 per turbine-year), which checks the factorisation into blocks. Everything runs on a laptop CPU: about 20 ms per
+turbine-day for the primary engine, 9-12 minutes for the whole validation campaign. The full comparison, the particle
+filter without change-point guidance and the cost table are in [docs/engines.md](docs/engines.md).
 
 ## Limitations
 
@@ -502,8 +469,8 @@ server in real time with room to spare.
 - **Approximations of the engine.** Blocks are independent except for the yaw plug-in; at most one fault type is
   active per block at a time; run lengths beyond 120 days and the nuisance states at change points are merged by
   moment matching. The joint particle filter, which has none of these approximations, is the check.
-- **Idealised injected faults**, the same as in the earlier projects (a cos² yaw law driven by the vane, a pure
-  anemometer scale error, a hard power cap, a proportional cooling loss). Real faults come and go and mix.
+- **Idealised injected faults**, the same as in the earlier projects and of the twin's own fault types, so the
+  right-cause rate is an upper bound (see the note under the key results).
 - **One farm, six turbines, two test years.** 48 injections per scenario (about ±7 points on a detection rate); false
   alarms from 12 turbine-years.
 - **No CARE to Compare score.** The benchmark's datasets are single turbines without neighbours, and the twin's
@@ -566,26 +533,4 @@ not depend on them.
 
 ## References
 
-- R. P. Adams, D. J. C. MacKay (2007). *Bayesian online changepoint detection.* arXiv:0710.3742.
-- P. Fearnhead, Z. Liu (2007). *On-line inference for multiple changepoint problems.* J. R. Stat. Soc. B 69(4),
-  589-605.
-- R. Chen, J. S. Liu (2000). *Mixture Kalman filters.* J. R. Stat. Soc. B 62(3), 493-508.
-- A. Doucet, N. de Freitas, K. Murphy, S. Russell (2000). *Rao-Blackwellised particle filtering for dynamic Bayesian
-  networks.* Proc. UAI 2000, 176-183.
-- N. J. Gordon, D. J. Salmond, A. F. M. Smith (1993). *Novel approach to nonlinear/non-Gaussian Bayesian state
-  estimation.* IEE Proc. F 140(2), 107-113.
-- E. I. George, R. E. McCulloch (1993). *Variable selection via Gibbs sampling.* J. Am. Stat. Assoc. 88(423), 881-889
-  (spike-and-slab priors).
-- G. E. P. Box, G. C. Tiao (1968). *A Bayesian approach to some outlier problems.* Biometrika 55(1), 119-129.
-- M. D. Hoffman, A. Gelman (2014). *The No-U-Turn sampler.* J. Mach. Learn. Res. 15, 1593-1623.
-- D. Phan, N. Pradhan, M. Jankowiak (2019). *Composable effects for flexible and accelerated probabilistic programming
-  in NumPyro.* arXiv:1912.11554.
-- A. Gelman, J. B. Carlin, H. S. Stern, D. B. Dunson, A. Vehtari, D. B. Rubin (2013). *Bayesian Data Analysis*, 3rd
-  ed., ch. 5 (hierarchical models).
-- R. A. Howard (1966). *Information value theory.* IEEE Trans. Syst. Sci. Cybern. 2(1), 22-26.
-- L. S. Shapley (1953). *A value for n-person games.* In: Contributions to the Theory of Games II, 307-317.
-- M. Bastankhah, F. Porté-Agel (2014). *A new analytical model for wind-turbine wakes.* Renewable Energy 70, 116-123.
-- M. M. Pedersen et al. *PyWake: an open-source wind farm simulation tool.* DTU Wind Energy,
-  https://gitlab.windenergy.dtu.dk/TOPFARM/PyWake.
-- C. Plumley, R. Takeuchi. *Kelmarsh wind farm data.* Cubico Sustainable Investments, Zenodo,
-  doi:10.5281/zenodo.16807551.
+The literature behind the model and the engines: [docs/references.md](docs/references.md).
