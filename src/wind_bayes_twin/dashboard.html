@@ -36,9 +36,10 @@ p { margin: 0 0 10px; color: var(--ink2); max-width: 900px; }
 .card { background: var(--surface); border: 1px solid var(--border); border-radius: 10px; padding: 16px;
         margin-top: 16px; }
 .controls { display: flex; flex-wrap: wrap; gap: 12px 20px; align-items: center; margin: 8px 0; }
-label { font-size: 14px; color: var(--ink2); display: flex; gap: 8px; align-items: center; }
+label { font-size: 14px; color: var(--ink2); display: flex; gap: 8px; align-items: center; max-width: 100%; min-width: 0; }
 select, button { font: inherit; color: var(--ink); background: var(--surface); border: 1px solid var(--border);
          border-radius: 6px; padding: 4px 10px; }
+select { min-width: 0; max-width: 100%; }  /* long option texts must not widen the page on a phone */
 button { cursor: pointer; }
 input[type=range] { width: min(420px, 60vw); }
 .plot { width: 100%; }
@@ -179,7 +180,7 @@ function drawParams() {
     layout.shapes.push(...eventShapes(t, [faultOf[p.key]], "y" + ax + " domain"));
   });
   layout.xaxis = axis({type: "date", anchor: "y" + n});
-  layout.margin.t = 20;
+  layout.margin.t = 32;  // room for the first panel's title above the plot
   Plotly.react("params", traces, layout, cfg);
 }
 
@@ -194,12 +195,17 @@ function drawWaterfall() {
   const x = ["potential", ...steps.map(s => s[1]), "actual"];
   const y = [w.potential, ...steps.map(s => -w[s[0]]), w.actual];
   const measure = ["absolute", ...steps.map(() => "relative"), "total"];
+  // on a phone the ten bars are too narrow for two-line value labels: totals only, values in the hover
+  const narrow = innerWidth < 600;
   Plotly.react("waterfall", [{type: "waterfall", x: x, y: y, measure: measure,
-    text: y.map((v, i) => i === 0 || i === y.length - 1 ? v.toFixed(0) : v.toFixed(0) + " MWh<br>£" + (v * 50 / 1000).toFixed(1) + "k"),
-    textposition: "outside", connector: {line: {color: css("--axis")}},
+    text: y.map((v, i) => i === 0 || i === y.length - 1 ? v.toFixed(0) :
+      (narrow ? "" : v.toFixed(0) + " MWh<br>£" + (v * 50 / 1000).toFixed(1) + "k")),
+    textposition: "outside", textfont: {size: narrow ? 10 : 12}, connector: {line: {color: css("--axis")}},
     increasing: {marker: {color: css("--good")}}, decreasing: {marker: {color: css("--muted")}},
     totals: {marker: {color: css("--ink2")}}, hovertemplate: "%{x}<br>%{y:.1f} MWh<extra></extra>"}],
-    base({yaxis: axis({title: {text: "MWh"}, range: [w.actual * 0.85, w.potential * 1.05]}), xaxis: axis({})}), cfg);
+    base({margin: {l: 60, r: 20, t: 10, b: narrow ? 110 : 36},
+          yaxis: axis({title: {text: "MWh"}, range: [w.actual * 0.85, w.potential * 1.05]}),
+          xaxis: axis(narrow ? {tickangle: -90} : {})}), cfg);
 }
 
 const qSel = document.getElementById("qdate");

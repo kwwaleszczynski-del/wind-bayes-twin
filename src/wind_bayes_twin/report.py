@@ -79,7 +79,8 @@ def fig_replay(rp: dict, path: Path):
                  alpha=1 if f == rp["fault"] else 0.6, label=FAULT_LABEL[f])
     ax1.axhline(0.9, color=MUTED, lw=0.8, ls="--")
     ax1.set_ylabel("P(material fault)")
-    ax1.set_ylim(-0.03, 1.03)
+    ax1.set_ylim(-0.03, 1.38)  # headroom: the legend sits above the probabilities, not on them
+    ax1.set_yticks(np.arange(0, 1.01, 0.2))
     ax1.legend(ncol=3, fontsize=8, loc="upper left")
     p = rp["param"]
     truth = np.where(rel < 0, 0.0, rp["truth"] * (np.clip(rel / rp["ramp"], 0, 1) if rp["ramp"] else 1.0))
@@ -182,8 +183,9 @@ def fig_fleet(clean: pd.DataFrame, events: pd.DataFrame, path: Path):
     z = np.array(rows)
     xs = w.index
     fig, ax = plt.subplots(figsize=(10, 7.4))
-    ax.imshow(z, aspect="auto", cmap="Blues", vmin=0, vmax=1, interpolation="nearest",
-              extent=(0, len(xs), len(rows), 0))
+    im = ax.imshow(z, aspect="auto", cmap="Blues", vmin=0, vmax=1, interpolation="nearest",
+                   extent=(0, len(xs), len(rows), 0))
+    fig.colorbar(im, ax=ax, fraction=0.025, pad=0.01, label="weekly maximum P(material fault)")
     ax.set_yticks(np.arange(len(rows)) + 0.5, labels, fontsize=7)
     ticks = [k for k, d in enumerate(xs) if d.month in (1, 7) and d.day <= 7]
     ax.set_xticks(ticks, [xs[k].strftime("%b %Y") for k in ticks])
@@ -234,13 +236,14 @@ def fig_tradeoff(tr: pd.DataFrame, path: Path):
     fig, axes = plt.subplots(1, 2, figsize=(9.6, 3.9), sharey=True)
     for ax, col, title in ((axes[0], "detected", "detected within 90 days"),
                            (axes[1], "right_cause", "detected, first alarm names the right cause")):
-        for sys_name, color, lab in (("twin", TWIN, "Bayesian twin (P threshold)"),
-                                     ("WARP + NBM", CHARTS, "WARP + NBM charts (h x factor)")):
+        # twin labels above-left of the point, chart labels below-right, so the two curves' labels do not collide
+        for sys_name, color, lab, off, ha in (("twin", TWIN, "Bayesian twin (P threshold)", (-4, 2), "right"),
+                                              ("WARP + NBM", CHARTS, "WARP + NBM charts (h x factor)", (3, -9), "left")):
             g = tr[tr["system"] == sys_name].sort_values("false_alarms_per_turbine_year")
             ax.plot(g["false_alarms_per_turbine_year"], g[col] * 100, "o-", color=color, ms=4, lw=1.4, label=lab)
             for _, r in g.iterrows():
                 ax.annotate(f"{r['setting']:g}", (r["false_alarms_per_turbine_year"], r[col] * 100), fontsize=7,
-                            color=color, xytext=(3, -9), textcoords="offset points")
+                            color=color, xytext=off, textcoords="offset points", ha=ha)
         ax.set_xscale("log")
         ax.set_xlabel("false alarms per turbine-year (unmodified 2019-2020)")
         ax.set_title(title, fontsize=10, loc="left")
