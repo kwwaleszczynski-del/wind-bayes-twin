@@ -11,24 +11,30 @@ clipped to +-5; two-sided CUSUM with k = 1 and h = the smallest threshold withou
 
 Both reset after an alarm. Each chart is mapped to the fault type it targets, which is its diagnosis.
 
+The WARP charts use WARP's own statistics (``rated``: all records with P^ >= 97 %; ``anemo``: one band of 4-11 m/s).
+``TWIN_STATS`` is the sensitivity variant on the twin's statistics instead (``full``, ``alo``, ``ahi``), with the same
+targets, sides and threshold rules.
+
 Usage:
     charts = Charts.calibrate(obs.y, cal_days)
     alarms = charts.run(y, first_day, last_day)          # list of (day, turbine, chart, cause)
 """
 from __future__ import annotations
 
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 
 import numpy as np
 
 WARP = {"pow": ("low", 0.03, "eff"), "rated": ("low", 0.03, "derate"), "anemo": ("both", 0.03, "anemo"),
         "yaw": ("both", 3.0, "yaw")}
+TWIN_STATS = {"pow": ("low", 0.03, "eff"), "full": ("low", 0.03, "derate"), "alo": ("both", 0.03, "anemo"),
+              "ahi": ("both", 0.03, "anemo"), "yaw": ("both", 3.0, "yaw")}
 NBM = {"tgear": "gear", "tgen": "gen"}
 H_MIN = 5.0
 NBM_K = 1.0
 TRAIL = (120, 31)
 Z_CLIP = 5.0
-CHART_CAUSE = {**{c: v[2] for c, v in WARP.items()}, **NBM}
+CHART_CAUSE = {**{c: v[2] for c, v in {**WARP, **TWIN_STATS}.items()}, **NBM}
 
 
 def cusum(z: np.ndarray, k: float, h: float, side: str):
@@ -66,12 +72,13 @@ class Charts:
     sigma: dict
     k: dict
     h: dict
+    warp: dict = field(default_factory=lambda: dict(WARP))  # chart -> (side, target, cause); chart = statistic
 
     @classmethod
-    def calibrate(cls, y: dict, cal: np.ndarray) -> "Charts":
+    def calibrate(cls, y: dict, cal: np.ndarray, warp: dict = WARP) -> "Charts":
         """Standardisation and thresholds from the fault-free calibration days ``cal`` (bool over days)."""
         mu, sigma, k, h = {}, {}, {}, {}
-        for c, (side, target, _) in WARP.items():
+        for c, (side, target, _) in warp.items():
             v = y[c][cal]
             mu[c] = np.nanmedian(v, axis=0)
             sigma[c] = 1.4826 * np.nanmedian(np.abs(v - mu[c]), axis=0)
@@ -87,7 +94,10 @@ class Charts:
             k[c] = np.full(v.shape[1], NBM_K)
             z = np.clip(v / sigma[c], -Z_CLIP, Z_CLIP)
             h[c] = max(cusum(z[:, i], NBM_K, np.inf, "both")[2].max() for i in range(v.shape[1])) * 1.0001
-        return cls(mu, sigma, k, h)
+        return cls(mu, sigma, k, h, dict(warp))
+
+    def __setstate__(self, state):  # charts pickled before ``warp`` existed are WARP's
+        self.__dict__.update({"warp": dict(WARP), **state})
 
     def z(self, chart: str, x: np.ndarray, i: int) -> np.ndarray:
         """Standardised daily values of turbine column ``i`` (x: the full daily series of that turbine)."""
@@ -98,8 +108,8 @@ class Charts:
     def run(self, y: dict, i: int, first: int, last: int) -> list[tuple[int, str, int]]:
         """Alarms (day, chart, direction) of turbine column ``i`` with the charts started on day ``first``."""
         out = []
-        for c in list(WARP) + list(NBM):
-            side = WARP[c][0] if c in WARP else "both"
+        for c in list(self.warp) + list(NBM):
+            side = self.warp[c][0] if c in self.warp else "both"
             z = self.z(c, y[c][:last, i], i)[first:last]
             days, dirs, _ = cusum(z, self.k[c][i], self.h[c], side)
             out += [(first + d, c, s) for d, s in zip(days, dirs)]

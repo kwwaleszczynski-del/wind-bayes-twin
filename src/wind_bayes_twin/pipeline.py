@@ -117,7 +117,8 @@ def calibrate(prep: Prepared, cache_dir: Path, results_dir: Path | None = None, 
         change = np.nanmedian(prep.obs.y[s][cal], axis=0) - np.nanmedian(prep.obs.y[s][base], axis=0)
         post.level_walk = float(np.sqrt(np.mean(change ** 2)) / np.sqrt(365.0))
         noise[s] = post
-        log.info("noise model %-6s R-hat %.3f, tau %.4f", s, post.rhat_max, post.tau)
+        log.info("noise model %-6s R-hat %.3f, min ESS %.0f, %d divergences, tau %.4f", s, post.rhat_max,
+                 post.ess_min, post.divergences, post.tau)
     rq = dispersion_quantiles(prep.farm, prep.terms, prep.farm.period(CAL_YEAR), prep.ref.p_max)
     charts = Charts.calibrate(prep.obs.y, cal)
     out = Calibration(noise, rq, charts, time.perf_counter() - t0)

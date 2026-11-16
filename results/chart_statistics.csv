@@ -1,0 +1,15 @@
+charts,setting,detected,median_days,right_cause_of_detected,right_cause,right_cause_excl_eff,right_cause_eff_derate_as_one,chance,false_alarms,false_alarms_per_turbine_year
+"WARP statistics (rated, anemo)",0.6,0.9968,13,0.6013,0.5994,0.7375,0.6923,0.8542,91,7.578
+"WARP statistics (rated, anemo)",0.8,0.9872,17,0.6932,0.6843,0.8354,0.8045,0.625,47,3.914
+"WARP statistics (rated, anemo)",1,0.9712,20.5,0.7244,0.7035,0.8562,0.8205,0.3958,25,2.082
+"WARP statistics (rated, anemo)",1.25,0.9311,24,0.7935,0.7388,0.9062,0.8638,0.2083,11,0.916
+"WARP statistics (rated, anemo)",1.6,0.9022,29,0.7833,0.7067,0.8917,0.8397,0.1667,9,0.7495
+"WARP statistics (rated, anemo)",2,0.8542,33,0.8255,0.7051,0.9,0.8397,0.04167,2,0.1666
+"WARP statistics (rated, anemo)",2.5,0.8077,36,0.8274,0.6683,0.8646,0.8013,0.02083,1,0.08328
+"twin statistics (full, alo, ahi)",0.6,0.9968,12,0.619,0.617,0.7562,0.7019,0.8958,99,8.244
+"twin statistics (full, alo, ahi)",0.8,0.9808,15,0.7206,0.7067,0.8604,0.8125,0.625,50,4.164
+"twin statistics (full, alo, ahi)",1,0.9663,20,0.733,0.7083,0.8688,0.8173,0.3542,24,1.999
+"twin statistics (full, alo, ahi)",1.25,0.9423,23,0.7925,0.7468,0.9167,0.8686,0.2083,11,0.916
+"twin statistics (full, alo, ahi)",1.6,0.9087,29,0.8078,0.734,0.9229,0.859,0.1667,9,0.7495
+"twin statistics (full, alo, ahi)",2,0.8734,32,0.8404,0.734,0.9354,0.8606,0.04167,2,0.1666
+"twin statistics (full, alo, ahi)",2.5,0.8269,35,0.8469,0.7003,0.9042,0.8221,0.02083,1,0.08328

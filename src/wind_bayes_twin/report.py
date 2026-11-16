@@ -244,11 +244,17 @@ def fig_tradeoff(tr: pd.DataFrame, path: Path):
             for _, r in g.iterrows():
                 ax.annotate(f"{r['setting']:g}", (r["false_alarms_per_turbine_year"], r[col] * 100), fontsize=7,
                             color=color, xytext=off, textcoords="offset points", ha=ha)
+            if col == "right_cause" and "right_cause_eff_derate_as_one" in g:
+                ax.plot(g["false_alarms_per_turbine_year"], g["right_cause_eff_derate_as_one"] * 100, "--",
+                        color=color, lw=1.1, alpha=0.7)
         ax.set_xscale("log")
         ax.set_xlabel("false alarms per turbine-year (unmodified 2019-2020)")
         ax.set_title(title, fontsize=10, loc="left")
     axes[0].set_ylabel("% of 624 injected faults")
     axes[0].legend(fontsize=8, loc="lower right")
+    if "right_cause_eff_derate_as_one" in tr:
+        (dashed,) = axes[1].plot([], [], "--", color="0.4", lw=1.1)
+        axes[1].legend([dashed], ["efficiency loss and derating\ncounted as one cause"], fontsize=8, loc="upper left")
     fig.savefig(path)
     plt.close(fig)
 

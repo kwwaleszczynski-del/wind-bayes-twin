@@ -54,6 +54,8 @@ class NoisePosterior:
     rhat_max: float
     unpooled_mu: np.ndarray  # per-turbine median (no pooling), for comparison
     level_walk: float = 0.0  # daily random-walk step of the healthy level (set from the year-to-year change)
+    ess_min: float = float("nan")  # smallest effective sample size of mu, sigma_e, sigma_w, phi (all chains)
+    divergences: int = -1  # divergent NUTS transitions after warm-up (-1: not recorded)
 
     def stationary_sd(self) -> np.ndarray:
         return np.sqrt(self.sigma_e ** 2 + self.sigma_w ** 2 / (1.0 - self.phi ** 2))
@@ -142,7 +144,7 @@ def fit_statistic(y: np.ndarray, count: np.ndarray, seed: int = 0, warmup: int =
     ``count`` holds the number of records behind each daily value.
     """
     import jax
-    from numpyro.diagnostics import gelman_rubin
+    from numpyro.diagnostics import effective_sample_size, gelman_rubin
     from numpyro.infer import MCMC, NUTS
 
     y = np.asarray(y, dtype=float)
@@ -157,14 +159,17 @@ def fit_statistic(y: np.ndarray, count: np.ndarray, seed: int = 0, warmup: int =
     var_scale = count_scale(count, c_ref)
     mcmc = MCMC(NUTS(_model, target_accept_prob=0.9), num_warmup=warmup, num_samples=samples, num_chains=chains,
                 chain_method="sequential", progress_bar=False)
-    mcmc.run(jax.random.PRNGKey(seed), z, observed, var_scale, y.shape[1])
+    mcmc.run(jax.random.PRNGKey(seed), z, observed, var_scale, y.shape[1], extra_fields=("diverging",))
     s = mcmc.get_samples(group_by_chain=True)
-    rhat = (max(float(np.max(gelman_rubin(np.asarray(s[k])))) for k in ("mu", "sigma_e", "sigma_w", "phi"))
-            if chains > 1 else float("nan"))
+    checked = ("mu", "sigma_e", "sigma_w", "phi")
+    rhat = (max(float(np.max(gelman_rubin(np.asarray(s[k])))) for k in checked) if chains > 1 else float("nan"))
+    ess = min(float(np.min(effective_sample_size(np.asarray(s[k])))) for k in checked)
+    divergences = int(np.sum(np.asarray(mcmc.get_extra_fields()["diverging"])))
     flat = {k: np.asarray(v).reshape(-1, *np.asarray(v).shape[2:]) for k, v in s.items()}
     tau = flat["tau"] * scale
     return NoisePosterior(
         c_ref=c_ref, mu_mean=centre + scale * flat["mu"].mean(0), mu_sd=scale * flat["mu"].std(0),
         sigma_e=scale * flat["sigma_e"].mean(0), sigma_w=scale * flat["sigma_w"].mean(0),
         phi=flat["phi"].mean(0), mu0=float(centre + scale * flat["mu0"].mean()), tau=float(tau.mean()),
-        tau_q=(float(np.quantile(tau, 0.05)), float(np.quantile(tau, 0.95))), rhat_max=rhat, unpooled_mu=med)
+        tau_q=(float(np.quantile(tau, 0.05)), float(np.quantile(tau, 0.95))), rhat_max=rhat, unpooled_mu=med,
+        ess_min=ess, divergences=divergences)

@@ -6,24 +6,36 @@
    "detected": 0.8878205128205128,
    "median_days": 24.0,
    "right_cause_of_detected": 0.9494584837545126,
+   "right_cause_of_all": 0.842948717948718,
+   "right_cause_excl_eff_of_all": 0.9125,
+   "right_cause_eff_derate_as_one_of_all": 0.8701923076923077,
    "chance": 0.10416666666666667
   },
   "WARP": {
    "detected": 0.7291666666666666,
    "median_days": 24.0,
    "right_cause_of_detected": 0.6285714285714286,
+   "right_cause_of_all": 0.4583333333333333,
+   "right_cause_excl_eff_of_all": 0.53125,
+   "right_cause_eff_derate_as_one_of_all": 0.5849358974358975,
    "chance": 0.25
   },
   "NBM": {
    "detected": 0.4342948717948718,
    "median_days": 22.0,
    "right_cause_of_detected": 0.6900369003690037,
+   "right_cause_of_all": 0.29967948717948717,
+   "right_cause_excl_eff_of_all": 0.38958333333333334,
+   "right_cause_eff_derate_as_one_of_all": 0.29967948717948717,
    "chance": 0.1875
   },
   "WARP + NBM": {
    "detected": 0.9711538461538461,
    "median_days": 20.5,
    "right_cause_of_detected": 0.7244224422442245,
+   "right_cause_of_all": 0.7035256410256411,
+   "right_cause_excl_eff_of_all": 0.85625,
+   "right_cause_eff_derate_as_one_of_all": 0.8205128205128205,
    "chance": 0.3958333333333333
   }
  },

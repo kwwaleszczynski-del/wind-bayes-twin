@@ -10,14 +10,18 @@ The whole validation was run with both inference engines on the same model, nois
 |---|---|---|---|
 | detected within 90 days | 88.8 % | 90.2 % | 90.4 % |
 | median days to detection | 24 | 24 | 25 |
-| first alarm names the right cause | 95 % | 93 % | 92 % |
-| false alarms per turbine-year | 0.50 | 0.42 | 0.25 |
+| first alarm names the right cause (of detected) | 95 % | 93 % | 92 % |
+| false alarms per turbine-year (alarms in 12 turbine-years) | 0.50 (6) | 0.42 (5) | 0.25 (3) |
 | efficiency -2 % / derating 5 % detected | 29 % / 88 % | 38 % / 92 % | 40 % / 92 % |
 | 90 % interval coverage: yaw / gearbox / generator | 88-90 % / 88-90 % / 73-75 % | 85-90 % / 88 % / 71-73 % | 85-92 % / 85-88 % / 67-69 % |
 | seconds per 90-day injection run (median) | 1.5 | 2.6 | 2.6 |
 
-The two engines agree to within a few points on every scenario, which checks the factorisation into blocks and the
-plug-in coupling of yaw and power: an approximation that mattered would show up as a gap. The particle filter is
+The totals are close. Per scenario the guided particle filter and the run-length engine differ by up to 8 points in
+detection (2 % efficiency loss: 29 % against 38 %) and up to 6 points in the share of detections with the right
+cause (derating: 83 % against 77 %; gearbox bearing +15 %: 100 % against 94 %), except for the 2 % efficiency loss
+(64 % of 14 detections against 89 % of 18). This checks the factorisation into blocks and the plug-in coupling of
+yaw and power for gaps of about ten points per scenario, not smaller ones; each engine was run with one seed. The
+particle filter is
 slightly more sensitive to power-curve faults - it can hold an efficiency loss and a derating at the same time and
 needs no plug-in - and slightly worse on the generator bearing, where Monte Carlo error adds to a noisy residual.
 

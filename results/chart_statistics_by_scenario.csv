@@ -1,0 +1,16 @@
+,detected,detected,right_cause,right_cause
+charts,"WARP statistics (rated, anemo)","twin statistics (full, alo, ahi)","WARP statistics (rated, anemo)","twin statistics (full, alo, ahi)"
+scenario,,,,
+yaw 4°,1,1,0.9583,0.9375
+yaw 8°,1,1,0.9792,0.9792
+yaw drift to 8° (60 d),1,1,0.8958,0.8958
+anemometer ±3 %,0.9167,1,0.6875,0.8333
+anemometer drift to ±5 % (60 d),1,1,0.7083,0.75
+efficiency -2 %,0.8125,0.7708,0.2292,0.1875
+efficiency -5 %,1,1,0.1875,0.1875
+efficiency drift to -5 % (60 d),0.9792,0.9167,0.1667,0.1458
+derating to 95 %,0.9583,0.9167,0.7708,0.7708
+gear bearing cooling +15 %,1,1,0.9167,0.8958
+gear bearing cooling +25 %,1,1,0.9375,0.9167
+generator bearing cooling +15 %,0.9583,0.9583,0.8125,0.8125
+generator bearing cooling +25 %,1,1,0.8958,0.8958

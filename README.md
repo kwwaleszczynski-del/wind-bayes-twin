@@ -24,43 +24,60 @@ replays of injected faults -
 
 ## Key results
 
-Validation: 624 known faults injected into real 2019-2020 SCADA (13 scenarios x 6 turbines x 8 start dates), model
-built on 2017 and calibrated on 2018, so nothing was tuned on the test years. The comparison runs the earlier
-projects' detectors - the four WARP CUSUM charts and the two NBM thermal charts - on the same daily statistics and the
-same injected faults.
+Validation: 624 known faults injected into real 2019-2020 SCADA (13 scenarios x 6 turbines x 8 start dates). The
+model is built on 2017 and its noise model calibrated on 2018; no parameter is fitted on 2019-2020, but several design
+choices were revised after looking at results on those years ([listed below](#what-changed-after-looking-at-the-test-years)).
+The comparison runs the earlier projects' detectors - the four WARP CUSUM charts and the two NBM thermal charts - on
+the same injected faults, the WARP charts on WARP's own full-load and anemometer statistics (the twin uses its own;
+[sensitivity below](#the-comparison)).
 
 | | Bayesian twin | WARP + NBM charts |
 |---|---|---|
 | injected faults detected within 90 days | 88.8 % | 97.1 % |
 | median days to detection | 24 | 20.5 |
-| **first alarm names the right cause** (of detected) | **95 %** | 72 % |
-| **false alarms per turbine-year** (unmodified 2019-2020) | **0.50** | 2.08 |
+| first alarm names the right cause, share of detected faults | 95 % | 72 % |
+| ... share of all 624 faults | 84 % | 70 % |
+| ... of all, efficiency loss and derating counted as one cause | 87 % | 82 % |
+| ... of all, without the three efficiency-loss scenarios | 91 % | 86 % |
+| false alarms per turbine-year, unmodified 2019-2020 (alarms in 12 turbine-years) | 0.50 (6) | 2.08 (25) |
 | chance of an alarm in a 90-day window without a fault | 10 % | 40 % |
 | fault size with a 90 % credible interval, onset date | yes | no |
 
-**Read the right-cause rate as an upper bound.** Every injected fault is one of the twin's own six fault types, one
-at a time, injected with nearly the physics of its observation model (a cos² yaw law driven by the vane, a pure
-anemometer scale error, a hard power cap, a proportional cooling loss). Real faults come and go, mix, and need not
-belong to that list; the 95 % does not cover them. The charts face the same injections.
+**Read these numbers as upper bounds.** Every injected fault is one of the twin's own six fault types, one at a time,
+and most are exact shifts of the statistics it models: an efficiency loss moves `pow` and `full` by exactly
+$`\ln(1-s)`$, an anemometer scale error moves `alo` and `ahi` by $`\ln(1+b)`$, a yaw offset moves the yaw statistic by
+exactly $`\delta`$. The power cap, the yaw power loss and the cooling loss follow laws close to the model's own (a hard
+cap, a cos² law driven by the vane, a loss proportional to the measured rather than the modelled temperature rise).
+This flatters detection, the right-cause rate, the interval coverage, the recovered sizes and the onset dates alike.
+Real faults come and go, mix, and need not belong to that list. The charts face the same injections.
 
-- **At the same false-alarm rate the twin detects as much, and names the cause far more often.** Moving each system's
-  alarm threshold traces its trade-off: at about one false alarm per turbine-year both detect 93-94 % of the faults,
-  but the twin's first alarm names the right cause in 86 % of all faults against 74 % for the charts. The charts' weak
-  point is the classic one - a power loss trips the full-load chart first and looks like a derating (51 % of
-  efficiency losses are diagnosed as derating); the twin weighs the partial-load evidence against both explanations
-  and waits until they part.
+- **The twin's advantage in naming the cause is confined to telling an efficiency loss from a derating.** Moving each
+  system's alarm threshold traces its trade-off. At about one false alarm per turbine-year both detect 93-94 % of
+  the faults and the twin's first alarm names the right cause in 86 % of all faults against 74 % for the charts.
+  Without the three efficiency-loss scenarios the two are level (92 % against 91 %); with efficiency loss and
+  derating counted as one cause the twin is 3 points ahead (89 % against 86 %). The charts lose the rest on the
+  classic confusion: the full-load chart is mapped to derating, a power loss trips it first, and 51 % of efficiency
+  losses are called deratings. The twin weighs the partial-load evidence against both explanations and waits until
+  they part. A chart rule that reads the partial-load chart before naming a derating might close part of that gap;
+  it was not tested. These matched-rate comparisons rest on few false alarms (11-13 per system in 12 turbine-years).
 
 ![trade-off between detection and false alarms](docs/img/tradeoff.png)
 
-- **Fault sizes are recovered with honest uncertainty where the model is right.** Yaw offsets of 4° and 8° come back
-  as 3.9° and 7.9° (90 % intervals about ±1.2°, covering the truth in 88-90 %); gearbox bearing cooling +15/+25 % as
-  +15.2/+25.2 % (88-90 % coverage); a 5 % efficiency loss as 4.6 % (94 %). Coverage falls to 73-81 % for the
-  anemometer and the generator bearing, whose real residuals wander more than the 2018 noise model knows.
-- **The onset of a step fault is dated to the day** (median error 0-2 days for yaw, efficiency and cooling steps); for
-  slow drifts the twin dates the moment the drift became visible, 12-17 days after it began.
-- **Small power losses are the price of few false alarms.** A 2 % efficiency loss is found in 29 % of the cases
-  (charts: 81 %, but with the right cause in 28 % of those): it is as large as the weeks-long wander of the reference
-  at full load, which the noise model learned from 2018 and does not mistake for a fault.
+- **Fault sizes are recovered with near-nominal intervals where the injected fault matches the model.** Yaw offsets
+  of 4° and 8° come back as 3.9° and 7.9° (90 % intervals about ±1.2°, covering the truth in 88-90 %); gearbox bearing
+  cooling +15/+25 % as +15.2/+25.2 % (88-90 % coverage); a 5 % efficiency loss as 4.6 % (94 %). Coverage falls to
+  73-81 % for the anemometer and the generator bearing, whose real residuals wander more than the 2018 noise model
+  knows. Coverage is scored on day 90 of each window only.
+- **Onset dates, read back on day 90.** Looking back from the last day of the window, the run-length posterior dates
+  a yaw step within 2 days of the truth in 83 % of the detected cases (median absolute error 0-2 days), a 5 %
+  efficiency loss in 44 % (median 3 days) and an anemometer step in 52 % (2 days). The cooling faults are 30-day
+  ramps without a sharp onset (median absolute error 3-31 days); for 60-day drifts the twin dates the moment the drift
+  became visible, a median of 12-17 days after it began. These are retrospective estimates after 90 days, not what
+  the twin knows on the day of its alarm.
+- **Small power losses are the price of few false alarms.** A 2 % efficiency loss is found in 29 % of the cases and
+  named correctly in 19 %, while 10 % of fault-free windows contain an alarm of some kind (charts: 81 % found, the
+  right cause in 28 % of those). The loss is as large as the weeks-long wander of the reference at full load, which
+  the noise model learned from 2018 and does not mistake for a fault.
 - **On unmodified data the twin reproduces what the earlier projects found by separate means**, now with numbers
   attached: T5's nacelle runs 3.6° (2.2-4.9°) off its neighbours by the end of 2021, flagged from June (WARP: -2.8°;
   "Check vane!" logged in July, vane faults in November-December); T5's generator bearing had a 16-18 % larger
@@ -72,9 +89,11 @@ belong to that list; the 95 % does not cover them. The charts face the same inje
   inspection on 31 December 2021 is T5's yaw (P = 0.95, £2.6/day), which under the stated costs does not pay within
   half a year. In the replays of injected faults the same rule recommends inspecting an efficiency drift (+£2.5k) and
   a 25 % generator cooling loss (+£1.3k).
-- **Two independent inference engines agree.** The same validation run with a joint particle filter (no block
-  factorisation, change-point-guided proposals) detects 90 % with the right cause in 93 % and 0.42 false alarms per
-  turbine-year - within a few points of the run-length engine on every scenario.
+- **A second inference engine gives similar totals.** The same validation run with a joint particle filter (no block
+  factorisation, change-point-guided proposals) detects 90 % with the right cause in 93 % of detections and 0.42 false
+  alarms per turbine-year (5 alarms). Per scenario the detection rates differ by up to 8 points (2 % efficiency
+  loss: 29 % against 38 %) and the right-cause rates by up to 6 points, except for that same small loss (64 % of 14
+  detections against 89 % of 18). One seed per engine.
 - **Runs on a laptop CPU**: the whole pipeline in about half an hour; one turbine-day of filtering takes about 20 ms
   (40-80 ms with credible intervals and loss attribution).
 
@@ -176,6 +195,11 @@ turbine with an unusual year from getting an implausible noise model, while $`\t
 data say so (the yaw levels do, the full-load levels hardly). The slow drift of the healthy level $`\nu`$ is set from
 the change of every turbine's median between the baseline and the calibration year.
 
+Convergence (2 chains x 600 draws after 600 warm-up, per statistic, over the turbine parameters): largest R-hat 1.02
+(generator bearing; 1.006 or less for the others), smallest effective sample size 223 of 1,200 draws (generator
+bearing; 285 for the gearbox bearing, at least 474 for the rest), one divergent transition in 8,400 (low-band
+anemometer).
+
 ## Inference
 
 ### Online: change-point recursion with Kalman segments (primary engine)
@@ -275,7 +299,8 @@ effective sample size of 1000.
 
 ### Protocol
 
-The same protocol as the earlier projects, so nothing is tuned on the test years:
+The same split as the earlier projects; no parameter is fitted on the test years (but see the design changes
+[below](#what-changed-after-looking-at-the-test-years)):
 
 | Period | Used for |
 |---|---|
@@ -297,11 +322,38 @@ day: 624 runs. Only the faulty turbine's own signals change; its references come
 | derating to 95 % | power capped at 95 % of rated | $`\kappa = 0.05`$ |
 | gear / generator bearing cooling +15 %, +25 % (30-day ramp) | bearing temperature + (ρ - 1) x (temperature - cooling side) | $`\rho - 1`$ |
 
+### What changed after looking at the test years
+
+No number is fitted on 2019-2020, but the design was revised during development with 2019-2020 results in view, so
+the test years were partly a development set and a fresh hold-out was not kept:
+
+- a first trial on unmodified 2019 raised too many false alarms; the robust noise (2 % outlier days), the slow walk of
+  the healthy level and the record-count scaling of the noise were added after it;
+- trial injections of a 10 % generator cooling loss led to the run-length engine as the primary engine and to alarms
+  per group of competing types; the generator scenarios became +15 % and +25 %, because +10 % equals the materiality
+  threshold;
+- after the first full campaign (86.5 % detected, 92 % of detections with the right cause), the offline noise model
+  got the same outlier-robust likelihood as the online filter, and the twin's full-load statistic was changed from
+  WARP's (`rated`) to `full`; the data were re-prepared, the noise model refitted on 2018 and the campaign rerun. All
+  numbers here are from that rerun. The charts kept WARP's statistic.
+
+### The comparison
+
 The comparison runs the WARP charts (power, full load, anemometer, yaw) and the NBM charts ("RC + fleet", trailing
-baseline, gearbox and generator bearing) on **the same daily statistics** and the same injected faults, with the
-thresholds of the earlier projects set on 2018. A system detects a fault when it alarms within 90 days; its diagnosis
-is the type its first alarm points to (the twin's most probable type, a chart's target). The chance level is the same
-count on the unmodified data in the same windows.
+baseline, gearbox and generator bearing) on the same injected faults, with the thresholds of the earlier projects set
+on 2018. The partial-load power, yaw and thermal statistics are the same as the twin's, but the WARP charts keep
+WARP's own full-load
+statistic (`rated`: all records with $`\hat P_t \ge 97\,\%`$) and its one-band anemometer statistic (`anemo`: 4-11
+m/s), where the twin uses `full`, `alo` and `ahi`. Run on the twin's statistics instead (same rules, thresholds set
+on 2018 the same way; `results/chart_statistics.csv`), the charts change by at most 2 points on the totals: at the
+default thresholds 96.6 % detected (97.1 % on WARP's statistics), the right cause in 71 % of all faults (70 %), 2.00
+false alarms per turbine-year (2.08); at about one false alarm per turbine-year 94 % detected and the right cause in
+75 % of all faults (92 % without the efficiency-loss scenarios). A 3 % anemometer step is caught in every case instead
+of 92 %, and efficiency losses are still called deratings. The comparison below does not depend on this choice.
+
+A system detects a fault when it alarms within 90 days; its diagnosis is the type its first alarm points to (the
+twin's most probable type, a chart's target). The chance level is the same count on the unmodified data in the same
+windows.
 
 ### Detection, delay and diagnosis
 
@@ -329,9 +381,11 @@ injected cause:
 
 The charts' higher raw detection comes with four times the false alarms: 40 % of 90-day windows contain a chart alarm
 even without a fault, so a good part of their "detections" of small faults are alarms that would have come anyway. All
-six false alarms of the twin in 2019-2020 are on the generator bearing, whose fleet-referenced residual has the
-largest weeks-long wander (episodes of fan and heater overloads in the status log); the other five fault types raised
-none.
+six false alarms of the twin in 2019-2020 are on the generator bearing (three on T1, two on T6, one on T4), whose
+fleet-referenced residual has the largest weeks-long wander (episodes of fan and heater overloads in the status log);
+the other five fault types raised none. The rates rest on few alarms: 6 for the twin and 25 for the charts in 12
+turbine-years. The twin's rate is the same 0.50 at the thresholds 0.9 and 0.95, and the points of the trade-off
+curves at or below about one false alarm per turbine-year rest on 1-13 alarms each.
 
 ![confusion matrices](docs/img/confusion.png)
 
@@ -356,8 +410,8 @@ Posterior on the last day of the 90-day window against the injected value:
 | gear bearing cooling +15 % / +25 % | 15 % / 25 % | 15.2 % / 25.2 % | 90 % / 88 % | 3.5 % |
 | generator bearing cooling +15 % / +25 % | 15 % / 25 % | 14.6 % / 24.6 % | 75 % / 73 % | 10.5 % |
 
-On data simulated from the model itself the 90 % intervals cover the truth in 94 % of 400 replications (gearbox
-bearing block; slightly conservative, checked in the tests). On real data they are close to nominal for yaw,
+On data simulated from the model itself the 90 % intervals of the gearbox bearing block cover the truth in 114 of 120
+replications (95 %, slightly conservative; the test accepts 82-97 %). On real data they are close to nominal for yaw,
 efficiency and the gearbox bearing, and too narrow for the anemometer and the generator bearing: there the residual
 wanders more than the AR(1) model learned on one year allows, and the injected faults are not exactly the model's (a
 vane-driven cos² law, a cooling loss proportional to the measured rather than the modelled temperature rise). Biases
@@ -366,6 +420,31 @@ and the derating are underestimated by about 1 point (the posterior still weighs
 and the 2 % efficiency loss has not been accepted at all after 90 days in 7 of 10 cases.
 
 ![parameter recovery](docs/img/recovery.png)
+
+Coverage is checked only on the last day of each window; the daily intervals before it are not scored.
+
+### Are the probabilities calibrated?
+
+Every turbine-day and fault type of the 624 injection runs and of unmodified 2019-2020, binned by the twin's P(fault
+k), against the share of those type-days on which a material fault of type k was present (an injected fault counts
+from the day it becomes material: day 0 for steps, day 12-20 for drifts and ramps; unmodified days count as healthy,
+as for the false alarms):
+
+| P(fault k) | type-days | of which unmodified | mean P | share with a material fault |
+|---|---|---|---|---|
+| 0-0.05 | 297,796 | 25,026 | 0.007 | 0.020 |
+| 0.05-0.2 | 18,230 | 943 | 0.10 | 0.20 |
+| 0.2-0.5 | 8,792 | 254 | 0.33 | 0.51 |
+| 0.5-0.8 | 6,386 | 42 | 0.65 | 0.84 |
+| 0.8-0.9 | 3,654 | 7 | 0.86 | 0.96 |
+| 0.9-0.99 | 9,855 | 28 | 0.96 | 0.96 |
+| 0.99-1 | 18,563 | 16 | 0.999 | 0.989 |
+
+Where the twin is confident it is right about as often as it says: 96 % in the 0.9-0.99 bin; above 0.99 it is wrong
+on 1.1 % of the type-days instead of 0.1 %. Below 0.9 its probabilities are too low: a fault the twin gives about
+0.65 was there on 84 % of such type-days. Part of this is the design: every injection window contains a fault from a
+known day, far more often than the prior's onset rate assumes, so a posterior under that prior reads cautious here. The bins pool strongly correlated days of 624 runs, so the table is a
+check of the direction, not a precise calibration curve. The onset hazard itself was not varied in the validation.
 
 ### Two replays
 
@@ -386,6 +465,11 @@ an inspection (expected net value £1.3k).*
 ![fleet heat map](docs/img/fleet_2019_2021.png)
 
 *Weekly maximum of P(material fault) for every turbine and fault type; red ticks: related status-log messages.*
+
+On unmodified data the twin raised 2 alarms in 2019, 4 in 2020 and 11 in 2021: in 2021 four on generator bearings
+(T1 twice, T5, T6), three anemometer alarms in the February icing (T3, T4, T5), three on T5's yaw and one on T2's
+yaw. There is no ground truth for them; the cases below read them against the status logs, which is interpretation,
+not a score. The 2019-2020 alarms, all on generator bearings, count as false in the validation.
 
 **Logged events.** The status logs of 2019-2021 hold 111 episodes related to the twin's fault types (messages of the
 same group on the same turbine within 14 days merged): 46 generator cooling (fan and heater overloads), 21 pitch and
@@ -438,9 +522,11 @@ drift on T1 (+£2.5k on day 90) and a 25 % generator cooling loss on T5 (+£1.3k
 
 ## Engines and computational cost
 
-The whole validation was run with both inference engines on the same model, noise model and injected faults; they agree
-within a few points on every scenario (detected 88.8 % and 90.2 %, right cause 95 % and 93 %, false alarms 0.50 and
-0.42 per turbine-year), which checks the factorisation into blocks. Everything runs on a laptop CPU: about 20 ms per
+The whole validation was run with both inference engines on the same model, noise model and injected faults. The
+totals are close (detected 88.8 % and 90.2 %, right cause 95 % and 93 % of detections, false alarms 0.50 and 0.42 per
+turbine-year); per scenario detection differs by up to 8 points and the right cause by up to 6, except for the 2 %
+efficiency loss. That checks the factorisation into blocks for gaps of about ten points per scenario, not smaller
+ones, with one seed per engine. Everything runs on a laptop CPU: about 20 ms per
 turbine-day for the primary engine, 9-12 minutes for the whole validation campaign. The full comparison, the particle
 filter without change-point guidance and the cost table are in [docs/engines.md](docs/engines.md).
 
@@ -460,17 +546,26 @@ filter without change-point guidance and the cost table are in [docs/engines.md]
   - *Cooling vs sensor drift*: a thermal-resistance change scales with the temperature rise, a sensor drift does not;
     with one state per bearing, a drifting sensor is reported as a cooling change.
 - **Sensitivity to priors.** The onset hazard (one fault per type per ~3 years), the slab widths and the materiality
-  thresholds set how much evidence an alarm needs. They are stated, not fitted; the trade-off curves show what a
-  different alarm threshold buys. The healthy levels and noise come from one calibration year: a year of unusual
-  weather or an undetected fault in it shifts them.
+  thresholds set how much evidence an alarm needs. They are stated, not fitted, and not varied in the validation; the
+  trade-off curves show only what a different alarm threshold buys. The healthy levels and noise come from one
+  calibration year: a year of unusual weather or an undetected fault in it shifts them.
+- **Design revised on the test years.** No number was fitted on 2019-2020, but the noise model, the engine and the
+  full-load statistic were changed after looking at results there (see the list under the protocol); there is no
+  untouched hold-out year with injections.
+- **Partial calibration checks.** Interval coverage is scored on the last day of each window only; the reliability
+  of P(fault) is checked on pooled, correlated days whose fault prevalence is set by the design.
+- **Quiet on healthy data, checked mostly on simulated noise.** The tests that the twin stays quiet and covers at
+  the nominal rate use noise simulated from the model itself; on real data the evidence is the 12 unmodified
+  turbine-years, with 6 alarms.
 - **Model error the noise model does not know.** The slow wander of the reference (weather regimes lasting weeks) is
   modelled as AR(1) with parameters from 2018; where it is larger than that, the twin raises false alarms (most of
   them on the generator bearing, whose residual wanders the most), where smaller, it is slower than needed.
 - **Approximations of the engine.** Blocks are independent except for the yaw plug-in; at most one fault type is
   active per block at a time; run lengths beyond 120 days and the nuisance states at change points are merged by
   moment matching. The joint particle filter, which has none of these approximations, is the check.
-- **Idealised injected faults**, the same as in the earlier projects and of the twin's own fault types, so the
-  right-cause rate is an upper bound (see the note under the key results).
+- **Idealised injected faults**, the same as in the earlier projects, of the twin's own fault types and mostly exact
+  shifts of its statistics, so detection, the right-cause rate, coverage, recovered sizes and onset dates are upper
+  bounds (see the note under the key results).
 - **One farm, six turbines, two test years.** 48 injections per scenario (about ±7 points on a detection rate); false
   alarms from 12 turbine-years.
 - **No CARE to Compare score.** The benchmark's datasets are single turbines without neighbours, and the twin's
@@ -511,7 +606,7 @@ src/wind_bayes_twin/
   bocpd.py         Bayesian online change-point detection (Adams & MacKay 2007)
   attribution.py   lost energy by cause (Shapley), value-of-information inspection ranking
   faults.py        fault injection into real records
-  baselines.py     WARP and NBM CUSUM charts on the same statistics
+  baselines.py     WARP and NBM CUSUM charts (on WARP's statistics or the twin's)
   validation.py    injection campaign, alarms, false alarms
   experiments.py   campaign summaries, logged events, decisions, energy balance
   pipeline.py, twin.py, report.py, cli.py, dashboard.html
